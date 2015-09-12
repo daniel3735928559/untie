@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet href="style.xsl" type="text/xsl"?>
+<page title="Tasks" uri="files.xml">
+  <items name="File Management Tasks">
+    <item name="Remove the file with the most 'z's in its filename">
+      We know already how to remove groups of files that we can
+      describe with globs.  For instance,  
+      <code>~/untie/tfr$ rm a*.png</code>
+      will remove all files starting with 'a' and ending in '.png',
+      and 
+      <code>~/untie/tfr$ rm day{1,2,4}/*.jpg</code>
+
+      will remove all jpg files from the folders day1, day2, and
+      day4.  
+
+      But what if the file we want to remove is not something that
+      globbing can get us but grep can.  For instance, maybe we want
+      all files that look like
+
+      <code>[some pattern]_[the same thing as before]</code>
+
+      
+    </item>
+    <item name="Change PNG to png">
+      <p>Get into the directory ~/untie/tfp/ and have a look around: 
+
+      <code>~/untie$ cd tfp
+~/untie/tfp$ ls
+a.PNG  b.PNG  c.png  d.png  e.png  f.png  g.png  h.png  i.PNG  j.png  k.png  l.png  
+m.PNG  n.PNG  o.PNG  p.png  q.png</code>
+
+Perhaps someone got a pile of png files but then proceeded to edit a
+few of them with a program that insisted on saving them with the PNG
+extension rather than png.  Since bash is case-sensitive, this could
+prove mildly annoying and we'd therefore like to correct it.  
+</p>
+
+<p>We should break this problem down into pieces: First, we want a
+list of just the .PNG files.  This is easy enough: 
+
+<code>~/untie/tfp$ ls *PNG
+a.PNG  b.PNG  i.PNG  m.PNG  n.PNG  o.PNG </code>
+
+Next we have a few choices of attack plan.  For instance, we could run
+through each of these and change them to a.PNG a.png so that we'd have
+a sequence like: 
+
+<code>a.PNG a.png
+b.PNG b.png
+i.PNG i.png
+m.PNG m.png
+n.PNG n.png
+o.PNG o.png</code>
+
+But what to do with this?  
+</p>
+
+    </item>
+  </items>
+</page>

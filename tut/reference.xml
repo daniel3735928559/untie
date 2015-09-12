@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet href="style.xsl" type="text/xsl"?>
+<page title="References" uri="reference.xml">
+<h3>References</h3>
+<p>Here we provide references for your basic bash needs.  This does
+not claim to be a substitute for the manpages of any programs
+discussed, nor a complete treatise on the bash scripting language.
+Rather, it should provide you enough information to complete the tasks
+and examples set in this tutorial, and enough context that you can
+approach the relevant manpages with confidence.</p>
+</page>

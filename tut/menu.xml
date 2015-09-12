@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<menu>
+  <menuitem text="Start" url="start.xml" />
+  <menuitem text="Basic Tutorial" url="basicintro.xml">
+    <menuitem text="Concepts" url="basicbash.xml" />
+    <menuitem text="Some Commands" url="basiccmds.xml" />
+    <menuitem text="Guided Tasks" url="basictasks.xml" />
+    <menuitem text="Exercises" url="basicexamples.xml" />
+  </menuitem>
+  <menuitem text="Advanced Tutorial" url="advanced.xml">
+    <menuitem text="UNIX Philosophy" url="philosophy.xml" />
+    <menuitem text="Guided tasks" url="tasks.xml" />
+    <menuitem text="Exercises" url="examples.xml" />
+  </menuitem>
+  <menuitem text="References" url="reference.xml">
+    <menuitem text="Language" url="bash.xml" />
+    <menuitem text="Commands" url="commands.xml" />
+    <menuitem text="Some programs" url="programs.xml">
+      <menuitem text="sed" url="sed.xml" />
+      <menuitem text="git" url="git.xml" />
+      <menuitem text="python" url="python.xml" />w
+      <menuitem text="hexdump" url="hexdump.xml" />
+      <menuitem text="xsltproc" url="xslt.xml" />
+    </menuitem>
+  </menuitem>
+</menu>

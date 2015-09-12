@@ -1,0 +1,503 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet href="style.xsl" type="text/xsl"?>
+<page title="Tasks" uri="tasks.xml">
+<items name="Advanced Guided Tasks">
+<item name="File Manipulation Tasks">
+  <item name="Scale down all images">
+      <p>The folder "tim" contains a large number of files, some of
+      which are JPEG images.  Maybe you want to upload all these
+      images somewhere, but they are huge and will take forever to
+      upload.  Further, your image-sharing app of choice downscales
+      images anyway, so uploading the ultra hi-res versions wins you
+      nothing except an ultra-long upload time.</p>
+
+      <p>Perhaps we can scale them all down locally and then upload
+      the smaller versions?  But there easily hundreds--must we really
+      open 100 images in an editor, navigate its menus 100 times,
+      select our scaling options each time?  If your editor is
+      sufficiently advanced, it may be able to batch-operate on your
+      images, but otherwise you're out of luck.  With the shell, you
+      don't have to pray that the programmer implemented multiple
+      image processing or some specialised scripting language.
+      Instead, you can write a small program stringing together little
+      programs to accomplish your goal.</p>
+    
+      <p>The big-picture problem is to scale-down all jpg images in
+      the "tim" folder.  The key to accomplishing this in the shell is
+      breaking the problem down into pieces.  We first need a program
+      that takes an image and makes it smaller.  The <cmd
+      name="convert" /> program will do this.  Great.  But we
+      need to feed it two things: The filename of a single image that
+      we want to scale down, and the desired filename of the scaled
+      down result.  </p>
+
+      <p>The procedure, then, will be the following: 
+      <ul>
+	<li>Get a list of all the JPEG files in the folder.  </li>
+	<li>For each filename: 
+	<ul>
+	  <li>Generate modified filenames for the rescaled files.</li>
+	  <li>Pass the original filename and the modified filename to
+	  the convert command.</li>
+	</ul></li>
+      </ul>
+      We do each of these in turn: 
+      </p>
+      <item name="List all jpg files">
+	<p>There are a few ways to do this.  (That will be a pattern
+	that shows up frequently.  Eventually I'll stop pointing it
+	out and you'll just expect to see a few different solutions to
+	each task.)  One approach is to first get a list of all the
+	files, using <cmd name="ls" />:
+
+	<code>~/untie/tbf$ <b>ls</b>
+a
+abc
+abpsldugndj
+spsda
+</code>
+
+        Now we want to send this list to a program that will print
+	only lines that match a given pattern.  For that, we use <cmd
+	name="grep" />:
+	
+<code>~/untie/tbf$ <b>ls | grep 'ps'</b>
+abpsldugndj
+spsda</code>
+
+        And this outputs all files that contain the string 'ps'.  If
+        we want all files that begin with a, we can use the special
+        character '^' which, to grep, means "beginning of the line":
+
+<code>~/untie/tbf$ <b>ls | grep '^a'</b>
+a
+abc
+apsldugndj</code>
+
+        We want all file ending with "jpg", so we use instead the
+	special character '$' which, to grep, means "end of the line":
+
+<code>~/untie/tbf$ <b>cd ../tim</b>
+~/untie/tim$ <b><cmd name="ls" /> | <cmd name="grep" /> 'jpg$'</b>
+a.jpg
+c.jpg
+d.jpg
+e.notajpg     <red>Hmph</red></code>
+
+
+	Er, not quite, since that last file isn't a jpg.  What numpty
+	named the file like that anyway?  We could just remove the
+	file or rename it, but we can also circumvent it by searching
+	instead for files that end in ".jpg".  
+
+<code>~/untie/tim$ <b><cmd name="ls" /> | <cmd name="grep" /> '.jpg$'</b>
+a.jpg
+c.jpg
+d.jpg
+e.notajpg    <red>WHAT ARE YOU STILL DOING HERE</red></code>
+
+	The problem is that '.' is a special character to grep, much
+	like '^' and '$' were.  It is the wildcard meaning `any single
+	character'.  So we were not asking for files that ended in
+	".jpg" as we thought, but rather only files that ended in
+	[some character]jpg, which e.notajpg certainly does.  To tell
+	grep not to treat the '.'  as special, we preceed it with a
+	backslash:
+
+
+<code>~/untie/tim$ <b><cmd name="ls" /> | <cmd name="grep" /> '\.jpg$'</b>
+a.jpg
+c.jpg
+d.jpg</code>
+
+	Finally.  But wait.  
+
+
+<code>~/untie/tim$ <b><cmd name="ls" /></b>
+a.jpg
+b.JPG
+c.jpg
+e.notajpg
+d.jpg
+f.JPG
+g.mp3
+h.jpg.kidding
+</code>
+
+        Some of the files end in JPG rather than jpg.  grep, like most
+        Unix programs, is case-sensitive unless told not to be.  The
+        "-i" switch tells grep to ignore case.  
+
+<code>~/untie/tim$ <b><cmd name="ls" /> | <cmd name="grep" /> -i '\.jpg$'</b>
+a.jpg
+b.JPG
+c.jpg
+d.jpg
+f.JPG</code>
+
+        At last.  
+	</p>
+
+	<p>Just for good measure, we mention another way: <cmd
+	name="find" /> is a rather general-purpose utility for
+	finding all files with a certain property: 
+
+<code>~/untie/tim$ <b><cmd name="find" /> -name '\.jpg'</b></code>
+
+        find, unlike grep, does not treat '.' as a special, so we have
+	just told it to look for files actually called '\.jpg', of
+	which there are none.  
+
+<code>~/untie/tim$ <b><cmd name="find" /> -iname '*.jpg'</b>
+a.jpg
+b.JPG
+c.jpg
+d.jpg
+f.JPG</code>
+
+        But there's still something we missed.  ls is the command for
+	listing all the files in the folder, but by default it does
+	not list all files.  Specifically, it ignores files that
+	begin with a '.' character.  The idea being that these files
+	are "hidden", in the weak sense that ls doesn't show them by
+	default.  You can use the -a switch to see all the hidden
+	stuff: 
+
+
+<code>~/untie/tim$ <b><cmd name="ls" /> -a</b>
+.lol.h4x
+.urstpidface
+.secret.jpg
+a.jpg
+b.JPG
+c.jpg
+e.notajpg
+d.jpg
+f.JPG
+g.mp3
+h.jpg.kidding
+</code>
+
+        So finally, we can use ls -a with the above to get honestly
+	everything: 
+
+<code>~/untie/tim$ <b><cmd name="ls" /> -a | <cmd name="grep" /> -i '\.jpg$'</b>
+.secret.jpg
+a.jpg
+b.JPG
+c.jpg
+d.jpg
+f.JPG</code>
+
+	</p>
+
+	<p>Finally, there is also the method of globbing: 
+<code>~/untie/tim$ <b><cmd name="echo" /> *.jpg *.JPG</b>
+a.jpg c.jpg d.jpg b.JPG f.JPG</code>
+
+       This gets annoying when there are hidden files though, as *
+       doesn't expand to include them.  So we need extra globs which
+       we explicitly say begin with a '.':
+
+<code>~/untie/tim$ <b><cmd name="echo" /> *.jpg *.JPG .*.jpg .*.JPG</b>
+a.jpg c.jpg d.jpg b.JPG f.JPG .secret.JPG</code>
+</p>
+
+       <p>There is one thing that is stupider than the file called
+       e.notajpg, which is the file called photo.  This is, in fact,
+       also a jpg, as revealed by the file command:
+
+<code>~/untie/tim$ <b><cmd name="file" /> photo</b>
+...</code>
+
+       So officially, it could be that looking for files blah.jpg is
+       not enough, and we have to run file on each of the files to
+       find which are actually images.  If you're pulling the pictures
+       all from one SD card from your personal camera, this scenario
+       is unlikely.  If you're recovering irreplaceable image files
+       from a partially corrupted hard drive of unknown origin, it
+       becomes somewhat less unlikely.  We'll save dealing with this
+       subtlety for later.  
+       </p>
+    </item>
+    <item name="Iterating over the filenames">
+      <item name="Using a while loop">
+      <p>Now that we've got the filenames, we'd like to say, for
+      example, `do a thing to each of them'.  There are a couple of
+      ways of doing this.  For instance,
+
+
+<code>~/untie/tim$ <b><cmd name="ls" /> -a | <cmd name="grep" /> -i '\.jpg$' | <cmd name="sed" /> 's/p/o/'</b>
+.secret.jog
+a.jog
+b.JPG
+c.jog
+d.jog
+f.JPG</code>
+
+      Very useful.  Ahem.  </p>
+
+      <p>Simply piping the list to some other program is frequently
+      useful, but for more complicated tasks, it would be nice to have
+      a variable that runs through each element of the list.  There is
+      a common idiom using bash while loops that allows you to pipe
+      input to a variable, which will read values one at a time: 
+
+<code>~/untie/tim$ <b><cmd name="ls" /> -a | <cmd name="grep" /> -i '\.jpg$' | while read x; do echo hello $x; done</b>
+hello .secret.jpg
+hello a.jpg
+hello b.JPG
+hello c.jpg
+hello d.jpg
+hello f.JPG</code>
+
+      So now, if we didn't mind overwriting the original images, we
+      could do: 
+<code>~/untie/tim$ <b><cmd name="ls" /> -a | <cmd name="grep" /> -i '\.jpg$' | while read x; do echo convert -scale 25%x25% $x; done</b></code>
+
+      And we'd be done!  But if we want to keep the hi-res images but
+      just make some temporary small images for uploading, we need to
+      take the next step.  But first, an alternate method of doing
+      what we just did:
+      </p>
+      </item>
+      <item name="Using a for loop">
+      <p>There is an alternate construction that is sometimes
+      preferred, namely bash for loops.  bash for loops provide a nice
+      way to run a variable through a list if you are in a position to
+      enter the list in by hand:
+
+<code>~/untie/tim$ <b>for x in 1 2 M 4 5; do echo hello $x; done</b>
+hello 1
+hello 2
+hello M
+hello 4
+hello 5</code>
+
+      We cannot simply type our list into the command we type.  (Well,
+      we can copy and paste it from the output of the earlier command,
+      but the list is hundreds of files long, and why introduce more
+      human factor than is needed?)  But it is generated as the output
+      of a command, so we can put that command in instead:
+
+<code>~/untie/tim$ <b>for x in ls -a; do echo hello $x; done</b>
+ls
+-a</code>
+
+      Remember that in bash, <a href="philosophy.xml#In bash,
+      everything is a string">everything is a string</a>.  So bash
+      simply treats the above as iterating through the list of strings
+      "ls" and then "-a".  We rather want to run this command, and put
+      its output at that spot in the script.  To do this, we use <a
+      href="bash.xml#$()">command substitution</a>.  Specifically, we
+      do just plop the command in the place where we want its output
+      to appear, but we enclose it in $(...): 
+
+
+<code>~/untie/tim$ <b>for x in $(ls | grep -i '\.jpg'); do echo hello $x; done</b>
+hello .secret.jpg
+hello a.jpg
+hello b.JPG
+hello c.jpg
+hello d.jpg
+hello f.JPG</code>
+
+      Good.  
+      </p>
+
+      <p>When to use a for loop vs a while loop is dictated by subtle
+      concerns that rarely come into play.  For instance, if the list
+      generated is so very very long (on the order of many MB long),
+      substituting the list into the command may explode.  Also, if
+      you substitute the input in, that entire command must run before
+      the for loop starts, whereas the while loop can continuously
+      read its input and execute its body.  In practice, I prefer the
+      while loop simply because I like thinking of the data as moving
+      from left to right always.  I make no claim that this is a good
+      reason, but I am writing the tutorial here, so I'll give it
+      preference in what follows.  </p>
+      </item>
+    </item>
+    <item name="Editing the filenames">
+      <p>Now if you imagine you're inside the above loop, you have the
+      filename in a variable.  You want to change the file to, for
+      example, small_a.jpg.  This is easy--remember that in bash,
+      everything is a string.  So you can just smash strings together
+      and get a longer string: 
+      
+<code>~/untie/tim$ <b>x=a.jpg; echo hello $x</b>
+hello a.jpg
+~/untie/tim$ <b>x=a.jpg; echo hello$x</b>
+helloa.jpg
+~/untie/tim$ <b>x=a.jpg; echo small_$x</b>
+small_a.jpg</code>
+
+      So it's easy: 
+    
+      <code>~/untie/tim$ <b><cmd name="ls" /> -a | <cmd name="grep" /> -i '\.jpg$' | while read x; do echo convert -scale 25%x25% $x small_$x; done</b></code>
+      
+      There was this annoying thing where some files ended in .jpg and
+      others in .JPG.  Since we get to pick the name of the output
+      file, we do now have the opportunity to resolve this
+      annoyingness once and for all.  Unfortunately, it is no longer
+      just a matter of concatenating strings--we actually want to edit
+      the string.  A nice, general-purpose command for editing strings
+      is <cmd name="sed" />.  For example: 
+
+      <code>~/untie/tim$ <b>echo hello | sed 's/e/a/'</b>
+hallo</code>
+   
+      sed is complicated and we won't discuss all the details here,
+      but the two things to know about it for the moment are that
+
+      <code><b>sed 's/something/other/'</b></code>
+      
+      Will replace the first instance of "something" in each line of
+      input with "other".  
+
+      <code>~/untie/tim$ <b>echo hello | sed 's/l/b/'</b>
+heblo</code>
+
+      If you want to replace all occurrances, use: 
+
+      <code>~/untie/tim$ <b>echo hello | sed 's/l/b/g'</b>
+hebbo</code>
+
+      For us, we want to replace any JPG and the end of the line with
+      jpg.  So 
+
+      <code>~/untie/tim$ <b>echo b.JPG | sed 's/JPG/jpg/'</b>
+b.jpg</code>
+
+      This is great.  Probably.  Less so if we happen to get
+
+      <code>~/untie/tim$ <b>echo IMAJPG.JPG | sed 's/JPG/jpg/'</b>
+IMAjpg.JPG</code>
+
+      We could use /g, or we could search not just for the string
+      "JPG" to replace, but rather for "JPG$" (where sed, like grep,
+      understands '$' to mean "end of the line"):  
+
+
+      <code>~/untie/tim$ <b>echo IMAJPG.JPG | sed 's/JPG$/jpg/'</b>
+IMAJPG.jpg</code>
+
+      For example: 
+
+<code>~/untie/tim$ <b><cmd name="ls" /> -a | <cmd name="grep" /> -i '\.jpg$' | while read x; do echo $x | sed 's/JPG$/jpg/'; done</b>
+.secret.jpg
+a.jpg
+b.jpg
+c.jpg
+d.jpg
+f.jpg
+</code>
+      
+      Looking good.  Now we just need a way to take the output of the
+      command 
+
+      <code><b>echo $x | sed 's/JPG$/jpg/'</b></code>
+
+      And use that as the last argument to the convert command.  For
+      this, we use command substitution: 
+      
+
+      <code>~/untie/tim$ <b><cmd name="ls" /> -a | <cmd name="grep" /> -i '\.jpg$' | while read x; do echo convert -scale 25%x25% $x small_$(echo $x | sed 's/JPG$/jpg/'); done</b></code>
+      
+      </p>
+
+      <p>If you like, you could instead relegate the reduced images to
+      another folder:
+
+      <code>~/untie/tim$ <b>mkdir smaller</b>
+~/untie/tim$ <b><cmd name="ls" /> -a | <cmd name="grep" /> -i '\.jpg$' | while read x; do echo convert -scale 25%x25% $x smaller/small_$(echo $x | sed 's/JPG$/jpg/'); done</b>
+~/untie/tim$ <b>ls smaller</b>
+small_.secret.jpg
+small_a.jpg
+small_b.jpg
+small_c.jpg
+small_d.jpg
+small_f.jpg
+</code>
+
+      There is one further small annoying subtlety: What if we had a
+      file called "a.jpg" and another, perversely, already called
+      "small_a.jpg"?  Then this command would overwrite small_a.jpg
+      with the scaled a.jpg!  So in theory, if we were in a position
+      where this was a danger, we might want to add in a check for
+      this.  But we'll leave that for a later time.  </p>
+
+      <p>In general, if you're writing a one-off script like this, you
+      are free to make any assumptions that appear to apply, like
+      "none of the files of interest are hidden" and "really, all the
+      files are called DSC0028.JPG, so I don't have to worry about JPG
+      vs jpg" and "All the .JPG files are images, and none of the
+      non-.JPG files are images."  In this context, we're bringing up
+      the annoying edge-cases to provide examples for how to use sed
+      and friends.  In the real world, these concerns apply mostly
+      when you are writing a script that you will save and run
+      repeatedly, possibly on other peoples' files.  Maybe on
+      someone's wedding photos.  Then obnoxiuos safeguards become
+      useful.  Or just back up your files and otherwise live
+      dangerously.  Up to you.  </p>
+
+    </item>
+  </item>
+
+</item>
+<item name="String Manipulation Tasks">
+</item>
+<item name="Network Tasks">
+</item>
+<item name="Hodgepodge">
+  <item name="Find the missing file">
+    In the tf directory, you have files aa, ab, ac, ..., all the way
+through zz.  But do you really have all of them?  If you did, there
+would be 26*26 files, i.e.: 
+
+<code>~/untie/tf$ echo $((26*26))
+676</code>
+
+But in fact, we have: 
+
+<code>~/untie/tf$ ls | wc -l
+675</code>
+
+How many files are missing?  
+
+<code>~/untie/tf$ echo $((26*26-$(ls | wc -l)))
+1</code>
+
+Which one is it?  There are many ways to do this: 
+
+<code>~/untie/tf$ diff --supress-common-lines -y &lt;(echo {a..z}{a..z} | tr ' ' '\n') &lt;(ls)
+hu</code>
+
+<code>~/untie/tf$ for x in {a..z}{a..z}; do [[ ! -e $x ]] &amp;&amp; echo $x; done
+hu</code>
+
+Gotcha.
+</item>
+
+<item name="List all png files in order of size">
+  <code>~/untie/tp$ stat --printf="%s %n\n" *xsl | sort -n</code>
+</item>
+
+<item name="Get the total size used up by bmp files">
+  This has many solutions:
+
+<code>~/untie/tp$ stat --printf="%s\n" *bmp | paste -s -d + | bc</code>
+
+<code>~/untie/tp$ echo $(stat --printf="%s\n" *bmp | tr '\n' +)0 | bc</code>
+
+<code>~/untie/tp$ stat --printf="%s\n" *bmp | awk '{x+=$1} END {print x}'</code>
+
+<code>~/untie/tp$ ans=0; for x in `ls | grep 'bmp$'`; do 
+> ans=$(($ans+$(stat --printf="%s\n" $x))); 
+> done; 
+~/untie/tp$ echo $ans</code>
+
+</item>
+</item>
+</items>
+</page>

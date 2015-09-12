@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet href="style.xsl" type="text/xsl"?>
+<page title="Introducing absh" uri="basicbash.xml">
+<items name="Meet your shell">
+
+
+<item name="Directories"><p>Your files are organised into directories, as
+you are probably used to.  Here, we'll explain briefly how to nagivate
+directories in bash.  </p>
+
+<p>There is one directory called "/" that serves as the "root
+directory"--that is, every other directory is inside /.  </p>
+
+<p>Whenever you're in the shell, you're always in some directory
+somewhere.  This is called the "working directory".  You can find it
+with the command 
+
+<code>~/untie$ pwd
+/home/potato/untie</code>
+
+This means that in the root directory there is a subdirectory called
+"home".  Inside home is a subdir called potato, and inside that is a
+subdir called untie, and that is the directory we are currently in.
+You can see this for yourself by navigating through all these
+directories:  
+
+<code>~/untie$ cd /
+/$ ls
+bin  boot  dev  etc  home  lib  lib64  lost+found  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+/$ cd home
+/home$ ls
+guest  potato
+/home$ cd potato
+~$ ls
+morestuff  stuff  untie
+~$ pwd
+/home/potato
+~$ cd untie
+~/untie$ pwd
+/home/potato/untie</code>
+
+Here, the commands we're using are:
+<ul><li>"cd"--for "change directory", which
+changes the working directory</li>
+<li>"ls"--for "list", which lists the files in the working
+directory</li>
+<li>"pwd"--for "print working directory" which prints the path to the
+current working directory.  </li>
+</ul>
+
+It should be noted that there are three ways of telling cd where to
+go: Either we can specify a directory that is inside the current
+working directory, as we did with "cd home", or we can specify the
+path to the destination directory, starting from the current
+directory, as in:
+
+<code>~/untie$ cd /
+/$ cd home
+/home$ cd potato/untie
+~/untie$ pwd
+/home/potato/untie</code>
+
+This is called specifying the "relative" path.  Note that you can also
+navigate backwards--the folder ".." always refers to one directory
+above you (unless you're in /, in which case it refers to /
+again--sadly there isn't some secret subbasement in your filesystem).
+Thus: 
+<code>~/untie$ cd /
+/$ cd bin
+/bin$ cd ../home/potato/untie
+~/untie$ pwd
+/home/potato/untie</code>
+
+Or we can specify the honest "absolute" path to the place we want to
+go: 
+<code>~/untie$ cd /
+/$ cd bin
+/bin$ cd /home/potato/untie
+~/untie$ pwd
+/home/potato/untie</code>
+
+</p></item>
+
+
+<item name="Command prompt">
+On the command-line, there is a string displayed to the left of the
+current cursor.  In your shell, provided you've set up as we
+described, that string will usually look like: [the current working
+directory] followed by a $ sign.  When we give code examples, we will
+always show the prompt before the code you're supposed to enter, so
+that you have some idea of which directory you're supposed to be in
+when running that code.  So, for example, when you see 
+<code>~/untie/tfp$ echo hello
+hello</code>
+
+The first line contains the command prompt.  So before you enter
+anything, the shell will look like just: 
+<code>~/untie/tfp$ </code>
+
+And you are supposed to enter the text "echo hello" and hit the enter
+key.  The next line shows the expected output of this command, namely
+"hello".  Some bash commands have no output, in which case another
+prompt will simply be displayed after you run it.  For example: 
+<code>~/untie$ cd tfp
+~/untie/tfp$ x=2
+~/untie/tfp$ echo blah
+blah
+~/untie/tfp$ foo
+bash: foo: command not found</code>
+</item>
+
+<item name="Tab completion">
+<p>Whenever you want to type the name of a command or file, type as much
+of it as you need to specify it unambiguously and then hit tab.  If
+there is only one command (or file) beginning with the prefix you have
+entered thus far, the remainder of that command or filename will be
+filled in for you.  If not, hitting tab a second time will bring up a
+list of the possible files or commands beginning with that prefix.  </p>
+</item>
+
+</items>
+</page>

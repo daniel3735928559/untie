@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet href="style.xsl" type="text/xsl"?>
+<page title="Introducing absh" uri="basicbash.xml">
+<items name="Meet your shell">
+
+<item name="Navigation"><p>Your files are organised into directories, as
+you are probably used to.  Here, we'll explain briefly how to nagivate
+directories in bash.  </p>
+
+<p>There is one directory called "/" that serves as the "root
+directory"--that is, every other directory is inside /.  </p>
+
+<p>Whenever you're in the shell, you're always in some directory
+somewhere.  This is called the "working directory".  You can find it
+with the command 
+
+<code>~/untie$ <b>pwd</b>
+/home/potato/untie</code>
+
+This means that in the root directory there is a subdirectory called
+"home".  Inside home is a subdir called potato, and inside that is a
+subdir called untie, and that is the directory we are currently in.
+You can see this for yourself by navigating through all these
+directories:  
+
+<code>~/untie$ <b>cd /</b>
+/$ ls
+bin  boot  dev  etc  home  lib  lib64  lost+found  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+/$ <b>cd home</b>
+/home$ <b>ls</b>
+guest  potato
+/home$ <b>cd potato</b>
+~$ ls
+morestuff  stuff  untie
+~$ <b>pwd</b>
+/home/potato
+~$ <b>cd untie</b>
+~/untie$ <b>pwd</b>
+/home/potato/untie</code>
+
+Here, the commands we're using are:
+<ul><li><b>cd</b>--for "change directory", which
+changes the working directory</li>
+<li><b>ls</b>--for "list", which lists the files in the working
+directory</li>
+<li><b>pwd</b>--for "print working directory" which prints the path to the
+current working directory.  </li>
+</ul>
+
+It should be noted that there are three ways of telling cd where to
+go: Either we can specify a directory that is inside the current
+working directory, as we did with "cd home", or we can specify the
+path to the destination directory, starting from the current
+directory, as in:
+
+<code>~/untie$ <b>cd /</b>
+/$ <b>cd home</b>
+/home$ <b>cd potato/untie</b>
+~/untie$ <b>pwd</b>
+/home/potato/untie</code>
+
+This is called specifying the "relative" path.  Note that you can also
+navigate backwards--the folder ".." always refers to one directory
+above you (unless you're in /, in which case it refers to /
+again--sadly there isn't some secret subbasement in your filesystem).
+Thus: 
+<code>~/untie$ <b>cd /</b>
+/$ <b>cd bin</b>
+/bin$ <b>cd ../home/potato/untie</b>
+~/untie$ <b>pwd</b>
+/home/potato/untie</code>
+
+Or we can specify the honest "absolute" path to the place we want to
+go: 
+<code>~/untie$ <b>cd /</b>
+/$ <b>cd bin</b>
+/bin$ <b>cd /home/potato/untie</b>
+~/untie$ <b>pwd</b>
+/home/potato/untie</code>
+
+</p></item>
+
+<item name="File manipulation">
+  To create, remove, and copy files and directories, we have the following basic commands: 
+  <item name="touch">
+    Use "touch filename" to create an empty regular file (i.e. not a directory) with name "filename".  
+    <code>~/untie$ <b>cd n0</b>
+~/untie/n0$ <b>ls</b>
+a  b
+~/untie/n0$ <b>touch defg</b>
+~/untie/n0$ <b>ls</b>
+a  b  defg</code>
+  </item>
+  <item name="mkdir">
+    touch creates regular files.  To create a directory, use instead mkdir: 
+    
+  
+    <code>~/untie/n0$ <b>ls</b>
+a  b  defg
+~/untie/n0$ <b>mkdir c</b>
+~/untie/n0$ <b>ls</b>
+a  b  c  defg
+~/untie/n0$ <b>cd c</b>
+~/untie/n0/c$ <b>ls</b>
+~/untie/n0/c$ <b>touch myfile</b>
+~/untie/n0/c$ <b>ls</b>
+myfile</code>  
+  </item>
+  <item name="mv">
+    "Move" in bash is a synonym for "rename", so if you have a file or
+    directory called "oldfile", you can change its name to "newfile"
+    with "mv oldfile newfile".  If newfile already exists and is a
+    regular file, it will be overwritten.  If newfile is a directory,
+    this will instead place oldfile into the directory newfile: 
+    <code>~/untie/n0/c$ <b>ls</b>
+myfile
+~/untie/n0/c$ <b>mv myfile newfile</b>
+~/untie/n0/c$ <b>ls</b>
+newfile
+~/untie/n0/c$ <b>cd ..</b>
+~/untie/n0$ <b>ls</b>
+a  b  c  defg
+~/untie/n0$ <b>mv b d</b>
+~/untie/n0$ <b>ls</b>
+a  c  d  defg
+~/untie/n0$ <b>mv a c</b><red>         Now we're moving a to the directory c</red>
+~/untie/n0$ <b>ls</b>
+c  d  defg
+~/untie/n0$ <b>ls c</b>
+a  newfile                 <red>And indeed, there's our old friend a</red>
+~/untie/n0$ <b>mv d defg</b>
+~/untie/n0$ <b>ls</b>
+c  defg                    <red>Notice that this overwrote defg</red>
+</code>  
+
+
+  </item>
+  <item name="cp">
+    To copy a file called "oldfile" into a new file called "newfile",
+    do simply: "cp oldfile newfile".  To copy a directory and all its
+    contents, you need to do "recursive copy": "cp -r olddir newdir".
+    Otherwise it is the same as mv.  
+  </item>
+  <item name="rm">
+    To remove a regular file, use "rm thefile".  To remove a directory and all its contents, you need to use recursive rm: "rm -r thedir"
+  </item>
+</item>
+
+<item name="Command prompt">
+On the command-line, there is a string displayed to the left of the
+current cursor.  In your shell, provided you've set up as we
+described, that string will usually look like: [the current working
+directory] followed by a $ sign.  When we give code examples, we will
+always show the prompt before the code you're supposed to enter, so
+that you have some idea of which directory you're supposed to be in
+when running that code.  So, for example, when you see 
+<code>~/untie/tfp$ echo hello
+hello</code>
+
+The first line contains the command prompt.  So before you enter
+anything, the shell will look like just: 
+<code>~/untie/tfp$ </code>
+
+And you are supposed to enter the text "echo hello" and hit the enter
+key.  The next line shows the expected output of this command, namely
+"hello".  Some bash commands have no output, in which case another
+prompt will simply be displayed after you run it.  For example: 
+<code>~/untie$ <b>cd tfp</b>
+~/untie/tfp$ <b>x=2</b>
+~/untie/tfp$ <b>echo blah</b>
+blah
+~/untie/tfp$ <b>foo</b>
+bash: foo: command not found</code>
+</item>
+
+<item name="Tab completion">
+<p>Whenever you want to type the name of a command or file, type as much
+of it as you need to specify it unambiguously and then hit tab.  If
+there is only one command (or file) beginning with the prefix you have
+entered thus far, the remainder of that command or filename will be
+filled in for you.  If not, hitting tab a second time will bring up a
+list of the possible files or commands beginning with that prefix.  </p>
+</item>
+
+</items>
+</page>

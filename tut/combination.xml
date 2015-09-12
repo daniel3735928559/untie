@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet href="style.xsl" type="text/xsl"?>
+<page title="Tasks" uri="combination.xml">
+<items name="Some Complicated Tasks">
+  <item name="Find the missing file">
+    In the tf directory, you have files aa, ab, ac, ..., all the way
+through zz.  But do you really have all of them?  If you did, there
+would be 26*26 files, i.e.: 
+
+<code>~/untie/tf$ echo $((26*26))
+676</code>
+
+But in fact, we have: 
+
+<code>~/untie/tf$ ls | wc -l
+675</code>
+
+How many files are missing?  
+
+<code>~/untie/tf$ echo $((26*26-$(ls | wc -l)))
+1</code>
+
+Which one is it?  There are many ways to do this: 
+
+<code>~/untie/tf$ diff --supress-common-lines -y &lt;(echo {a..z}{a..z} | tr ' ' '\n') &lt;(ls)
+hu</code>
+
+<code>~/untie/tf$ for x in {a..z}{a..z}; do [[ ! -e $x ]] &amp;&amp; echo $x; done
+hu</code>
+
+Gotcha.
+</item>
+
+<item name="List all png files in order of size">
+  <code>~/untie/tp$ stat --printf="%s %n\n" *xsl | sort -n</code>
+</item>
+
+<item name="Get the total size used up by bmp files">
+  This has many solutions:
+
+<code>~/untie/tp$ stat --printf="%s\n" *bmp | paste -s -d + | bc</code>
+
+<code>~/untie/tp$ echo $(stat --printf="%s\n" *bmp | tr '\n' +)0 | bc</code>
+
+<code>~/untie/tp$ stat --printf="%s\n" *bmp | awk '{x+=$1} END {print x}'</code>
+
+<code>~/untie/tp$ ans=0; for x in `ls | grep 'bmp$'`; do 
+> ans=$(($ans+$(stat --printf="%s\n" $x))); 
+> done; 
+~/untie/tp$ echo $ans</code>
+
+</item>
+</items>
+</page>

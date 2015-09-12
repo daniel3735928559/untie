@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet href="style.xsl" type="text/xsl"?>
+<page title="Basic Tutorial" uri="basicintro.xml">
+<h3>Basic Tutorial</h3>
+<p>Hello!  This tutorial contains the following: 
+
+<ul>
+<li><b><a href="basicbash.xml">Navigation: </a></b>How to navigate your filesystem in bash</li>
+<li><b><a href="basiccmds.xml">Top 25 commands: </a></b>Some standalone bash commands for
+inspecting, searching, and editing files, and more.</li>
+<li><b><a href="basictasks.xml">Guided tasks: </a></b>We'll now start seeing the true power of
+bash, which is not any of the commands in the previous section on its
+own, but the ability to string them together in pipelines and scripts.
+This section will guide you through some basic examples of this.</li>
+<li><b><a href="basicexamples.xml">Exercises: </a></b>Some further tasks except without guidance
+provided, but just a few possible answers and minimal commentary.</li>
+</ul></p>
+</page>

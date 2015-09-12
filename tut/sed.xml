@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet href="style.xsl" type="text/xsl"?>
+<page title="sed" uri="sed.xml">
+<h3>sed</h3>
+<pre>
+A typical use of sed is 
+
+cat my_file | sed 'command1;command2;...'
+
+We will go through a couple of examples of this, taken from the excellent
+document 
+
+http://sed.sourceforge.net/sed1line.txt
+
+and explain why they do what they do and will describe the concepts of sed in
+the course of doing so.  
+
+The basic idea of sed is that when you do: 
+
+cat my_file | sed 'command1;command2;...'
+
+each line of my_file, each in its turn, gets hit with the string of commands.
+For instance, the first example is that to emulate head -n 15, you can do sed
+'15q'.  So each line comes in to sed and it applies the command '15q' which is
+`if the incoming line is line number 15, print the current line and quit'.
+The foregoing lines also get printed because unless you pass sed the -n flag,
+it always prints the current line when it gets to the end of the command
+string.
+
+So in fact every command can be preceeded by a range.  That range can be a
+range of lines like 2,39 meaning `lines 2-39' or a single line, like the
+above, or a regex like /^h/ meaning `all lines that start with h'.  Other
+range specifiers include $ for `the last line' and 6~4 for `the first line and
+any fourth line thereafter (e.g. lines 10, 14, ...)'.  Any range specifier can
+have a ! after it, changing the meaning to `anything outside this range'.  So
+sed -n '15!p' means `print all but line 15'
+
+The next concepts are illustrated by the example
+
+sed -n '/AAA/{x;p;d};h'
+
+which prints any line just above a line that contains AAA.  The first thing to
+notice is that you are allowed to give a range not just one command as with
+'15q' but also a string of commands using {}.  For instance, sed -n
+'15{p;p;p}' would print line 15 three times.  
+
+The second operative concept here is that of `hold space'.  sed always has two
+`variables': The `pattern space', and the `hold space'.  When sed reads in a
+line, it immediately places that into the pattern space.  The command 'h'
+means `copy whatever is in the pattern space into the hold space, overwriting
+whatever might already be there'.  So the above command will just put the
+current line into the hold space.  Then, if the next line happens to match
+/AAA/, the previous line is in the hold space, so we just swap the pattern
+space and hold space with 'x', print the pattern space (which is now the
+previous line), and then ditch the current pattern space with 'd', which also
+skips applying the rest of the script to the current pattern space, and
+proceeds to the next line (with the /AAA/-matching line as the hold space), as
+it should be.  
+
+The final concept is often a subtle one to actually use: loops in the string
+of commands.  This is illustrated by the implementation of tail -n 3:
+
+sed ':a;$q;N;4,$D;ba'
+
+:a means simply `there is a label here called "a"' and ba is simply `jump to
+the label "a", still keeping the current pattern space (rather than reading in
+the next line as the new pattern space, as would happen if the :a; and ba were
+excluded).  Let us say my_file contains 
+
+a
+b
+c
+d
+e
+f
+
+Then the first line is read in, so the state is 
+
+PATTERN="a"
+LINE=1
+
+This is not the last line, so $q is skipped.  Then N tells it to append the next line to the pattern space so now 
+
+PATTERN="a\nb"
+LINE=2
+
+LINE &lt; 4, so the 4,$D is skipped.  Then 'ba' says `return to the :a'.  So still 
+
+PATTERN="a\nb"
+LINE=2
+
+and N gives us
+
+PATTERN="a\nb\nc"
+LINE=3
+
+and then repeating once more puts us right after N with
+
+PATTERN="a\nb\nc\nd"
+LINE=4
+
+except now we are in the range 4,$, so the 'D' command happens, which is the
+rather complicated command for: `delete up through the first newline in
+pattern space, and then start the next cycle, but keep the current pattern
+space (and don't read new input into it) if the D command didn't clear it
+completely'.
+
+So D starts us off on a new cycle with: 
+
+PATTERN="b\nc\nd"
+LINE=5
+
+N gives us 
+
+PATTERN="b\nc\nd\ne"
+LINE=5
+
+and 4,$D starts a new cycle with
+
+PATTERN="c\nd\ne"
+LINE=6
+
+Then N 
+
+PATTERN="d\ne\nf"
+LINE=6
+
+and we are on the last line, so $q runs which simply prints the current
+pattern space (which is now the last three lines of the file, as desired) and
+then exits.
+
+One can see this happening live by throwing in a couple of 'l' commands
+(basically `print the current pattern space in an unambiguous way').  So:
+
+> echo -e 'a\nb\nc\nd\ne\nf\ng'| sed  ':a;l;$q;N;4,$D;ba'
+a$
+a\nb$
+a\nb\nc$
+b\nc\nd$
+c\nd\ne$
+d\ne\nf$
+e\nf\ng$
+e
+f
+g
+> echo -e 'a\nb\nc\nd\ne\nf\ng'| sed  ':a;l;$q;N;l;4,$D;ba'
+a$
+a\nb$
+a\nb$
+a\nb\nc$
+a\nb\nc$
+a\nb\nc\nd$
+b\nc\nd$
+b\nc\nd\ne$
+c\nd\ne$
+c\nd\ne\nf$
+d\ne\nf$
+d\ne\nf\ng$
+e\nf\ng$
+e
+f
+g
+</pre>
+</page>

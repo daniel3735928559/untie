@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet href="style.xsl" type="text/xsl"?>
+<page title="Introduction" uri="intro.xml">
+<h3>Intro</h3>
+
+<p>This tutorial will work by providing you with some tasks to
+accomplish and then walking you through the solutions step-by-step.
+However, since doing anything at all on the command-line will require
+some base-level skills, we'll start by explaining the first commands
+and concepts you'll need to start on the tasks.  This is covered in <a
+href="practical.xml">Practical Intro</a></p>
+
+<p>If you enjoy reading long texts, there are also some tips for how
+to think about Unix systems in general, and bash scripting in
+particular, all found in the <a href="philosophy.xml">Philosophy
+Intro</a>.  If you prefer to just get coding straight away, feel free
+to skip this for now.  Or forever.  It is non-essential, and my
+feelings won't be hurt, I promise.</p>
+
+</page>

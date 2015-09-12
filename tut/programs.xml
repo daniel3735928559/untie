@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet href="style.xsl" type="text/xsl"?>
+<page title="Programs" uri="programs.xml">
+<h3>Some useful programs</h3>
+<p>There are some programs that are very useful on the command line
+but are a bit complicated for the quick summary explanation, so here
+we provide not a complete tutorial on each of them, but enough
+information to enable both basic usage and the derivation of actual
+help from the sometimes obscure manpages.</p>
+
+<p>In particular, the goal here is to get you started and then point
+you in the direction of resources that can explain the full use of the
+program in question.</p>
+</page>

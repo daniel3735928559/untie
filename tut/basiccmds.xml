@@ -1,0 +1,591 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet href="style.xsl" type="text/xsl"?>
+<page title="Top 25 UNIX Commands" uri="basiccmds.xml">
+<items name="Top 25 UNIX Commands">
+  You've learned how to naviage and move/copy/delete files using pwd,
+  cd, ls, mv, cp, and rm.  Now we present 25 other useful commands, as
+  taken from a census of the author's 97217-line bash history file
+  dating back to Feb 1 2012 (after ignoring more esoteric examples).
+  So, in no particular order, the top 25 everyday-use commands for
+  this particular author are:
+
+  <item name="echo">Sometimes you just want to output some fixed
+  string like "Success!" at the end of a script.  Or maybe you want to
+  output the current value of some variable.  Or maybe you just want
+  the computer to tell you that you are its friend.  In any event,
+  echo saves the day: 
+
+  <code>~/untie$ <b>echo hello</b>
+hello
+~/untie$ <b>echo</b>
+~/untie$ <b>x=hello</b>
+~/untie$ <b>echo x</b>
+x                              <red>In bash, x is just the string "x"</red>
+~/untie$ <b>echo $x               </b><red>If you want the value of the variable x, you need to say: $x</red>
+hello
+~/untie$ <b>echo hello | wc -c</b>
+6
+</code>
+
+  Just a moment!  What was that last one?  The "|" means redirect the
+  output of the previous command ("echo hello", in this case) to the
+  next command (here, "wc -c", which prints out how many characters it
+  receives as input).  But "hello" is only 5 characters!  echo always
+  prints out a newline at the end of its output, so the actual output
+  of "echo hello" is "hello\n"--6 characters.  You can make echo forgo
+  this newline by using "echo -n" instead:
+
+  <code>~/untie$ <b>echo -n hello</b>
+hello~/untie$
+~/untie$ <b>echo -n hello | wc -c</b>
+5
+</code>
+
+  Most of the time this is just awkward, as we see, but it is useful
+  for cases like with wc -c where the newline appears to trip up the
+  count.
+
+</item>
+
+  <item name="cat">echo was good for outputting a string or a
+  variable.  But what if we want to output the contents of a file?
+  cat does the job nicely: 
+
+  <code>~/untie$ <b>ls</b>
+...
+~/untie$ <b>cd b1</b>
+~/untie/b0$ <b>ls</b>
+a.c   cake   daffodil.jpg   gray.txt
+~/untie/b0$ <b>cat gray.txt</b>
+Here rests his head upon the lap of Earth
+A youth to Fortune and to Fame unknown.
+Fair Science frown'd not on his humble birth,
+And Melancholy mark'd him for her own.
+
+Large was his bounty, and his soul sincere,
+Heav'n did a recompense as largely send:
+He gave to Mis'ry all he had, a tear,
+He gain'd from Heav'n ('twas all he wish'd) a friend.
+
+No farther seek his merits to disclose,
+Or draw his frailties from their dread abode,
+(There they alike in trembling hope repose)
+The bosom of his Father and his God.
+
+Thomas Gray
+</code>
+  
+  If you try, however, to run
+
+<code><b>cat daffodil.bmp</b></code>
+
+  You will get gibberish.  But it's an image, apparently.  So why
+  don't we see an image when we output this file?  </item>
+
+
+  <item name="less">Before we get to daffodil.bmp, let us first look
+  at a.c.  
+
+  You can run
+  <code>~/untie/b0$ <b>cat a.c</b></code>
+
+  but it's kind of a long file and this is annoying to have it all
+  spit out to the terminal.  So you can instead of outputting it to
+  the terminal, have it shown to you in a way that lets you page
+  through the document at will and then close it when finished.  The
+  program that does this is called less: 
+
+  <code>~/untie/b0$ <b>less a.c</b></code>
+
+  This will temporarily hijack your terminal window to display the
+  document.  You can use the arrow keys and/or PgUp and PgDn (or b and
+  f, equivalently) to scroll through the document.  You can hit the
+  "/" key and then type a string to search for.  Hit the enter key to
+  start the search, and hit n to cycle through the results.  For
+  example, scroll to the middle of the file and type
+  "/bchunk&lt;enter&gt;" and then hit "n" repeatedly.  To search
+  backward instead, start you search with "?" instead of "/".  Note
+  that the the search begins at your current position.  To search from
+  the beginning of the file, use "@" as the start of your search
+  string, e.g.: "/@bchunk&lt;enter&gt;".
+</item>
+
+  <item name="hexdump">
+  <p>Now, back to daffodil.bmp: daffodil.bmp is a file--that is, a
+  sequence of bytes (numbers 0-255) sitting on your hard drive.
+  Certain programs can look at these bytes and treat them as a recipe
+  for changing the colours of certain pixels on your screen.  However,
+  when you output bytes to the terminal, they are treated as
+  characters according to the ASCII mapping.  That is, some people
+  once upon a time had a secret (okay, maybe not so secret) meeting
+  somewhere and agreed which bytes should correspond to which
+  characters, and they made a table, which you can see by doing
+
+  <code>~/untie$ <b>man ascii</b></code>
+
+  (Press q to quit looking at the table.)  So we see that the number
+  0x48 (72, in decimal, if you prefer, but try to get used to not
+  preferring) corresponds to the character "N".  So in our text file
+  above, the first number stored on the hard drive for that file was
+  the number 0x48, and when it got outputted, the terminal went to the
+  ASCII table and decided to show us an "H".</p>
+
+  <p>To see beyond the terminal's constant ASCII translation to what
+  the file actually is as an array of numbers, you can use hexdump:
+
+<code>~/untie/b0$ <b>hexdump -C gray.txt</b>
+00000000  48 65 72 65 20 72 65 73  74 73 20 68 69 73 20 68  |Here rests his h|
+00000010  65 61 64 20 75 70 6f 6e  20 74 68 65 20 6c 61 70  |ead upon the lap|
+00000020  20 6f 66 20 45 61 72 74  68 0a 41 20 79 6f 75 74  | of Earth.A yout|
+00000030  68 20 74 6f 20 46 6f 72  74 75 6e 65 20 61 6e 64  |h to Fortune and|
+00000040  20 74 6f 20 46 61 6d 65  20 75 6e 6b 6e 6f 77 6e  | to Fame unknown|
+00000050  2e 0a 46 61 69 72 20 53  63 69 65 6e 63 65 20 66  |..Fair Science f|
+00000060  72 6f 77 6e 27 64 20 6e  6f 74 20 6f 6e 20 68 69  |rown'd not on hi|
+00000070  73 20 68 75 6d 62 6c 65  20 62 69 72 74 68 2c 0a  |s humble birth,.|
+00000080  41 6e 64 20 4d 65 6c 61  6e 63 68 6f 6c 79 20 6d  |And Melancholy m|
+00000090  61 72 6b 27 64 20 68 69  6d 20 66 6f 72 20 68 65  |ark'd him for he|
+000000a0  72 20 6f 77 6e 2e 0a 0a  4c 61 72 67 65 20 77 61  |r own...Large wa|
+000000b0  73 20 68 69 73 20 62 6f  75 6e 74 79 2c 20 61 6e  |s his bounty, an|
+000000c0  64 20 68 69 73 20 73 6f  75 6c 20 73 69 6e 63 65  |d his soul since|
+000000d0  72 65 2c 0a 48 65 61 76  27 6e 20 64 69 64 20 61  |re,.Heav'n did a|
+000000e0  20 72 65 63 6f 6d 70 65  6e 73 65 20 61 73 20 6c  | recompense as l|
+000000f0  61 72 67 65 6c 79 20 73  65 6e 64 3a 0a 48 65 20  |argely send:.He |
+00000100  67 61 76 65 20 74 6f 20  4d 69 73 27 72 79 20 61  |gave to Mis'ry a|
+00000110  6c 6c 20 68 65 20 68 61  64 2c 20 61 20 74 65 61  |ll he had, a tea|
+00000120  72 2c 0a 48 65 20 67 61  69 6e 27 64 20 66 72 6f  |r,.He gain'd fro|
+00000130  6d 20 48 65 61 76 27 6e  20 28 27 74 77 61 73 20  |m Heav'n ('twas |
+00000140  61 6c 6c 20 68 65 20 77  69 73 68 27 64 29 20 61  |all he wish'd) a|
+00000150  20 66 72 69 65 6e 64 2e  0a 0a 4e 6f 20 66 61 72  | friend...No far|
+00000160  74 68 65 72 20 73 65 65  6b 20 68 69 73 20 6d 65  |ther seek his me|
+00000170  72 69 74 73 20 74 6f 20  64 69 73 63 6c 6f 73 65  |rits to disclose|
+00000180  2c 0a 4f 72 20 64 72 61  77 20 68 69 73 20 66 72  |,.Or draw his fr|
+00000190  61 69 6c 74 69 65 73 20  66 72 6f 6d 20 74 68 65  |ailties from the|
+000001a0  69 72 20 64 72 65 61 64  20 61 62 6f 64 65 2c 0a  |ir dread abode,.|
+000001b0  28 54 68 65 72 65 20 74  68 65 79 20 61 6c 69 6b  |(There they alik|
+000001c0  65 20 69 6e 20 74 72 65  6d 62 6c 69 6e 67 20 68  |e in trembling h|
+000001d0  6f 70 65 20 72 65 70 6f  73 65 29 0a 54 68 65 20  |ope repose).The |
+000001e0  62 6f 73 6f 6d 20 6f 66  20 68 69 73 20 46 61 74  |bosom of his Fat|
+000001f0  68 65 72 20 61 6e 64 20  68 69 73 20 47 6f 64 2e  |her and his God.|
+00000200  0a 0a 54 68 6f 6d 61 73  20 47 72 61 79 0a        |..Thomas Gray.|
+0000020e
+</code>
+
+  We use -C to see on the right column the ASCII translation of the
+  numbers, just for reference (or a . if the ASCII translation is not
+  a simple one-space character--for instance, notice that characters
+  0x200 and 0x201 are 0x0a, which the ASCII table tells us is the
+  newline character.  This is not easily printed in one space without
+  screwing up the output, so hexdump just shows a "." in the
+  right-hand column.)</p>
+
+  <p>You can print bytes directly by their hexadecimal values using
+  echo -e:
+
+<code>~/untie/b0$ <b>echo -e '\x41'</b>
+A
+~/untie/b0$ <b>echo -e '\x41\x42\x0a\x42\x41' </b><red>remember 0x0a is the byte corresponding to newline under ASCII</red>
+AB
+BA
+~/untie/b0$ <b>echo -e '\x41\x42CD\nEFGH'     </b><red>echo -e lets you mix normal output with byte output, and lets you specify a newline with \n as well</red>
+ABCD
+EFGH
+</code></p>
+
+<p>Now, because daffodil.bmp is a rather large file, we only inspect the
+first 256 bytes using the -n option to hexdump in addition to -C: 
+
+
+<code>~/untie/b0$ <b>hexdump -n 256 -C daffodil.bmp</b>
+00000000  42 4d 9e 03 07 00 00 00  00 00 8a 00 00 00 7c 00  |BM............|.|
+00000010  00 00 cc 01 00 00 4d 01  00 00 01 00 18 00 00 00  |......M.........|
+00000020  00 00 14 03 07 00 c3 0e  00 00 c3 0e 00 00 00 00  |................|
+00000030  00 00 00 00 00 00 00 00  ff 00 00 ff 00 00 ff 00  |................|
+00000040  00 00 00 00 00 ff 42 47  52 73 8f c2 f5 28 51 b8  |......BGRs...(Q.|
+00000050  1e 15 1e 85 eb 01 33 33  33 13 66 66 66 26 66 66  |......333.fff&amp;ff|
+00000060  66 06 99 99 99 09 3d 0a  d7 03 28 5c 8f 32 00 00  |f.....=...(\.2..|
+00000070  00 00 00 00 00 00 00 00  00 00 04 00 00 00 00 00  |................|
+00000080  00 00 00 00 00 00 00 00  00 00 07 07 07 05 05 05  |................|
+00000090  04 04 04 05 05 05 07 07  07 09 09 09 0a 0a 0a 0a  |................|
+000000a0  0a 0a 08 08 08 0b 0b 0b  0c 0c 0c 0a 0a 0a 0b 0b  |................|
+000000b0  0b 0e 0e 0e 0c 0c 0c 07  07 07 04 06 06 03 05 05  |................|
+000000c0  04 06 06 06 08 08 09 0b  0b 0a 0c 0c 0c 0e 0e 0e  |................|
+000000d0  10 10 10 12 12 10 12 12  0e 10 10 0c 0e 0e 0b 0d  |................|
+000000e0  0d 0b 0d 0d 07 09 09 03  04 02 06 05 01 0a 09 05  |................|
+000000f0  11 0c 0d 13 0e 10 15 0f  10 12 0e 0d 0e 0b 06 08  |................|
+00000100</code>
+
+Rather than containing mostly meaningful ASCII text, the numbers in
+this file are arranged in a way that an image viewer program can use
+to construct the arrangemnt of pixels that you end up seeing as the
+image.  You can read about how the numbers are organised at <a
+href="https://en.wikipedia.org/wiki/BMP_file_format">Wikipedia</a>,
+but for educational purposes, very quickly: bytes 0 and 1 (values 0x42
+and 0x4d) tell us that the file is a BMP file--in ASCII, these bytes
+are "B" and "M".  Byte number 0x0a (where we find byte value 0x8a)
+tells us that the actual image data starts at byte number 0x8a.  Bytes
+number 0x12-0x15 (cc 01 00 00) tell us that the image has a width of
+0x1cc pixels (460, in decimal), bytes 0x16-0x19 tell it that the image
+has a height of 0x14d pixels (333, in decimal), and the subsequent
+bytes give some other metadata after this fashion.  Then bytes 8a, 8b,
+and 8c give (respectively) the red, green, and blue values of the
+bottom left pixel--in this case a very dark colour indistinguishable
+from black.  Bytes 8d, 8e, and 8f will specify the next pixel to the
+right of this, and so on (the pixels are specified starting from theq
+bottom left and ending at the top right).</p>
+
+<p>There is further trickery that can happen even with text files
+though: Remember that we said that when you output a byte the terminal
+goes and looks it up in the ASCII table and prints what it finds?
+Yeah.  There is one exception to this, which is the byte 0x1b.  This
+byte is the ANSI terminal escape character.  When the terminal outputs
+this, the terminal doesn't actually show anything, but insteads notes
+to itself that the next byte or bytes (depending on what they are)
+should not be printed, but should be treated as special instructions
+for the terminal.  They might change the colour of the output, change
+the position of the cursor, or weirder.  
+
+For an example: 
+
+<code>~/untie/b0$ <b>echo -e '\x1b\x5b01;33mAAAAAAAAAAAAA'</b></code>
+
+should print out a bunch of yellow "A"s.  For an example of further
+havoc that it can wreak, comapre: 
+
+<code>~/untie/b0$ <b>cat cake</b></code>
+
+with 
+
+<code>~/untie/b0$ <b>hexdump -C cake</b></code>
+
+less does not treat the byte 0x1b specially--that is just a terminal
+thing--so if you just want to read the cake file with a small amount
+of interspersed gibberish, do
+
+<code>~/untie/b0$ <b>less cake</b></code>
+</p>
+
+  </item>
+
+  <item name="grep"><p>Say we have a list of (entirely fictional)
+  students and their exam scores.  In fact, we do: 
+
+  <code>~/untie/b0$ <b>cd ../b1</b>
+~/untie/b1$ <b>cat EG</b>
+Sims,Russell,C
+Fischer,Bruce,C
+Navarro,Jay,D
+Ball,Billy,C
+Soto,Russell,A
+Richardson,Tammy,F
+Hansen,Joan,C
+Manning,Crystal,A
+Maxwell,Martha,D
+...                       <red>truncated for brevity</red>
+</code>
+
+  Then we can get some basic statistics about this, e.g. how many
+  students passed, or how many students got a B, or which students
+  failed, etc.</p>
+
+  <p>First order of business, we want the names of the students with
+  Fs.  cat let us see all the lines in a file, but grep will let us
+  pick out the lines in a file that match a given pattern.  So, for
+  instance, we can find all the lines with an F in them with: 
+
+  <code>~/untie/b1$ <b>grep 'F' EG</b>
+Fischer,Bruce,C
+Richardson,Tammy,F
+Warren,Barry,F
+Steele,Frank,C
+French,Steven,A
+Fuller,Rita,D
+Fuller,Joshua,D
+Frazier,Jacob,A
+Jones,Ronald,F
+Jimenez,Shirley,F
+Joseph,Wayne,F
+Franklin,Laura,C
+Skinner,Edwin,F
+Fowler,Carrie,B
+Fowler,Oscar,A
+</code>
+  OK.  That's not what we wanted, since Bruce Fischer didn't get an
+  F, but he got listed because his name has a capital "F".  </p>
+
+  <p>The trick is that grep doesn't just let you search for strings in
+  a line, but more general patterns.  In fact, grep lets you search
+  for any "regular expression".  If you don't know what is a regular
+  expression (henceforth, "regex"), just know for now that it is a way
+  of searching for string patterns more complicated than just
+  substrings.  For instance, later we'll do "search for words with
+  consecutive doubled letters (like 'coffee')" using a regex.</p>
+
+  <p>Here, we want to search not just for F, but for F followed by the
+  end of the line.  In regex, the end of a line is denoted by "$", so
+  we want to search using the regex "F$": 
+  <code>~/untie/b1$ <b>grep 'F$' EG</b>
+Richardson,Tammy,F
+Warren,Barry,F
+Jones,Ronald,F
+Jimenez,Shirley,F
+Joseph,Wayne,F
+Skinner,Edwin,F
+</code>
+
+  Very good.  Regular expressions also let us specify "match one of
+  the following regular expressions" using an "or" operator: "|".  For
+  instance, 'F$|D$' will show lines that match either 'F$' or 'D$'.
+
+    <code>~/untie/b1$ <b>grep 'F$|D$' EG</b>
+~/untie/b1$
+</code>
+
+  Er.  Yes.  There is a problem.  Grep by default treats most
+  characters as actual parts of the string, so it treats this as
+  searching for "F, end of line, pipe character, D, end of line".  To
+  make the "|" have the special meaning of "or", we need to escape it
+  with a backslash: 
+
+  <code>~/untie/b1$ <b>grep 'F$\|D$' EG</b>
+Navarro,Jay,D
+Richardson,Tammy,F
+Maxwell,Martha,D
+Warren,Barry,F
+Manning,Curtis,D
+Meyer,Donald,D
+Burnett,Patrick,D
+Ross,Patricia,D
+Hunter,Katherine,D
+Fuller,Rita,D
+Fuller,Joshua,D
+Harrison,Kathleen,D
+Jones,Ronald,F
+Jimenez,Shirley,F
+Joseph,Wayne,F
+Mckinney,Calvin,D
+Barnes,Paul,D
+Howard,George,D
+Woods,Bobby,D
+Hicks,Jerry,D
+Skinner,Edwin,F
+  </code>
+
+  If you don't want to be constantly escaping special regex
+  characters, you can preceed the regex with "-P", which tells grep to
+  treat characters as having their special meaning unless they are
+  escaped: 
+
+  <code>~/untie/b1$ <b>grep -P 'F$|D$' EG</b>
+Navarro,Jay,D
+Richardson,Tammy,F
+Maxwell,Martha,D
+Warren,Barry,F
+Manning,Curtis,D
+Meyer,Donald,D
+Burnett,Patrick,D
+Ross,Patricia,D
+Hunter,Katherine,D
+Fuller,Rita,D
+Fuller,Joshua,D
+Harrison,Kathleen,D
+Jones,Ronald,F
+Jimenez,Shirley,F
+Joseph,Wayne,F
+Mckinney,Calvin,D
+Barnes,Paul,D
+Howard,George,D
+Woods,Bobby,D
+Hicks,Jerry,D
+Skinner,Edwin,F</code>
+
+  Your call.  This -P thing is our first example of a command-line
+  "switch" (or "flag")--most commands allow you to modify their
+  behaviour by following the command with -[something].  For instance,
+  grep ordinarily outputs all the lines that match the pattern.  You
+  can instead make it output the lines that don't match the pattern
+  with -v: 
+
+
+  <code>~/untie/b1$ <b>grep -v -P 'F$|D$' EG</b>
+Sims,Russell,C
+Fischer,Bruce,C
+Ball,Billy,C
+Soto,Russell,A
+Hansen,Joan,C
+Manning,Crystal,A
+Massey,Vincent,C
+Scott,Barry,B
+...                       <red>truncated for brevity</red></code>
+
+  Grep also supports the switch -c which, instead of printing the
+  lines that match, will print how many lines match: 
+
+
+  <code>~/untie/b1$ <b>grep -c -P 'F$|D$' EG</b>
+21</code>
+
+  And we can combine these last two to see how many lines didn't
+  match: 
+
+  <code>~/untie/b1$ <b>grep -c -v -P 'F$|D$' EG</b>
+122</code>
+
+  The order of the switches is usually not important: 
+
+  <code>~/untie/b1$ <b>grep -P -v -c 'F$|D$' EG</b>
+122</code>
+
+  And you can specify multiple switches after a single hyphen: 
+
+
+  <code>~/untie/b1$ <b>grep -Pvc 'F$|D$' EG</b>
+122</code>  
+
+  So we've found that 122 students passed while 21 failed.
+  </p>
+
+  <p>This file is also a list of random names, so we can treat it as a
+  sample to try get name statistics.  For example, how many family
+  names begin with a vowel?  To access this, we want some notation for
+  "beginning of line".  In regex, this is "^".  So we can get family names
+  that begin with A like: 
+
+  <code>~/untie/b1$ <b>grep '^A' EG</b>
+Ayala,Micheal,C
+Allison,Shawn,B</code>
+
+  So for the vowel question we could use
+
+  <code>~/untie/b1$ <b>grep -Pc '^A|^E|^I|^O|^U' EG</b></code>
+
+  But there is a nicer way: What we want to match is "Beginning of
+  line, followed by any character in the set 'A, E, I, O, U'".  grep
+  allows this "any character in the set ..." construction with the
+  notation "[AEIOU]": 
+
+  <code>~/untie/b1$ <b>grep -P '^[AEIOU]' EG</b>
+Ingram,Crystal,B
+Ayala,Micheal,C
+Estrada,Eddie,B
+Allison,Shawn,B
+Owen,Kathleen,B</code>
+
+  What if we ask the same question about given names?  We can get
+  close by searching for vowels after commas: 
+
+  <code>~/untie/b1$ <b>grep -P ',[AEIOU]' EG</b></code>
+
+  But people who got A grades will also show up.  So what we want is
+  to search for "comma, then a vowel, then any character at all".
+  That way, we'll miss "Soto,Russell,A", since that has the comma and
+  then the vowel, but this isn't followed by any character--it's
+  followed by the end of the line.  In regex, the notation for "any
+  character at all" is ".": 
+
+  <code>~/untie/b1$ <b>grep -Pc ',[AEIOU].' EG</b>
+13</code>
+
+  
+  
+</p>
+
+  <p>We won't give a full regex tutorial here, but as an illustration
+  of the sorts of things it can do, we now turn to the promised
+  example of finding words with consecutive doubled letters.  There is
+  a list of English words (not all of them, but a lot) in the file
+  called "words".  We can search it thus: 
+
+
+  <code>~/untie/b1$ <b>grep -P '(.)\1(.)\2' words</b></code>
+
+  In brief, the first "." means "any character", the "\1" means "the
+  same thing as was found in the first set of parantheses"--which in
+  this case will be the "any character", so "(.)\1" will let us search
+  for any character followed by that same character.  Then the next
+  (.)\2 will similarly search for another doubled letter immediately
+  following the first pair.  You can similarly search for triples of
+  doubled letters, but we'll leave it to you to find the one word
+  (or rather, the four variants thereof) with this property.  </p>
+
+  </item>
+
+  <item name="sed">
+    <p>Many times, you want not only to search a file, but also to
+    edit a file in some regular way.  For instance, maybe you have a
+    list of names and someone wants them in all caps, or you have the
+    source code for a program and you want to rename a variable.</p>
+
+    <p>
+    </p>
+  </item>
+
+  <item name="wc"></item>
+  <item name="find"></item>
+  <item name="nano">If you want to edit a file, there are plenty of
+  text editors in Linux--gedit is often available and is reasonably
+  intuitive.  leafpad is similar.  If you are willing to invest the
+  time in learning the ins and outs of a more advanced editor, emacs
+  and vim are both rather excellent.  But sometimes you want to very
+  quickly make a single edit to a file, and in this case (and possibly
+  only in this case) nano is appropriate.  To open a file, use 
+
+  <code>~/untie/b1$ <b>nano EG2</b></code>
+
+  And then you can move the cursor around with the arrow keys and type
+  as you are probably used to.  There isn't general cut and paste, but
+  Ctrl-k will cut a whole line, an Ctrl-u will paste it.  The commands
+  to use the editor are displayed along the bottom of the window,
+  e.g. it will say "^O WriteOut" and "^X Exit" meaning that Ctrl-o
+  saves the file and Ctrl-x exits nano.
+  </item>
+
+  <item name="strace"></item>
+
+  <item name="netcat"></item>
+  <item name="curl"></item>
+  <item name="scp"></item>
+  <item name="ssh"></item>
+
+  <item name="xargs"></item>
+  <item name="chmod"></item>
+  <item name="gpg"></item>
+  <item name="gzip,gunzip,bzip2,bunzip2,xz,unxz,etc."></item>
+  <item name="tar"></item>
+  <item name="du"></item>
+  <item name="diff"></item>
+
+  <item name="objdump,readelf,ldd"><p>We've discussed some programs for
+  viewing ASCII files and for viewing and editing files as ASCII.
+  hexdump allowed us to see the raw contents of a given file, and so
+  if we understand e.g. the BMP file format we can read off from the
+  hexdump the height and width of an image.</p>
+
+  <p>But hexdumps are not very user-friendly, and so most file formats
+  have corresponding programs that allow us to observe and manipulate
+  the properties stored in the file without having to know exactly how
+  these properties are layed out in the file as a big byte array.  The
+  ImageMagick suite is excellent for manipulating image files, and
+  scapy will let you mess with pcap files, for example.  </p>
+
+  <p>As a programmer, one sort of file you deal with frequently is the
+  executable.  In Linux, executable files are stored according to the
+  format called ELF ("Executable Linux Format"), but rather than
+  knowing exactly how this format organises the information it stores
+  on disk, all we have to know is what it stores and we can ask the
+  utilities objdump and/or readelf to extract the bits of information
+  we want.  </p>
+
+  <p></p>
+  </item>
+
+  <item name="man">For most commands, to get an explanation of what it
+  does, an explanation of the switches available for it, and a
+  description of its other inputs, you can do 
+
+  <code>~/untie$ <b>man [the command]</b></code>
+
+  The interface is the same as that of less.  
+  </item>
+
+</items>
+</page>

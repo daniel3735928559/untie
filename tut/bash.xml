@@ -1,0 +1,517 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet href="style.xsl" type="text/xsl"?>
+<page title="Bash reference" uri="bash.xml">
+<items name="Bash script language reference">
+<item name="quoting">
+  <item name='""'></item>
+  <item name="''"></item>
+</item>
+<item name="globbing">
+  <item name="*"></item>
+  <item name="{}"></item>
+</item>
+<item name="string operations">
+  <item name="{#}"></item>
+</item>
+<item name="arithmetic">
+  <item name="$(())"></item>
+  <item name="let"></item>
+  <item name="expr"></item>
+</item>
+<item name="substitution">
+  <item name="$()"></item>
+  <item name="``"></item>
+</item>
+<item name="input">
+  <p>The foregoing constructions bear a bit more comment before we
+  continue.  For instance, when we do:
+
+  <code>~/untie$ echo *
+tf tfp tn tp tut</code>
+
+  Does echo understand what "*" means and, on seeing it, decide to
+  print not an asterisk, but rather the names of all files in the
+  current directory?  And if so, what about 
+
+  <code>~/untie$ x=cho
+~/untie$ y=p
+~/untie$ e$x *$y
+tfp tp</code>
+
+  The answers lie in a careful understanding of what happens to the
+  code that you enter before the "echo" program even starts.  </p>
+
+  <p>Very briefly, the order of processing is as follows: 
+
+  <ol>
+    <li>Single-quoted strings</li>
+    <li>$ expressions (variables, arithmetic, subshells, etc.) and ``</li>
+    <li>Double-quoted strings</li>
+    <li>Globs</li>
+    <li>Concatenation</li>
+  </ol>
+
+  For an example, consider: 
+
+  <code>~/untie/tf$ <b>x=cho; y=blah; z=apple; e$x {a..c}b "*$y" '$z'</b>
+ab bb cb *blah $z</code>
+
+  We will show the evolution of this input following the four steps,
+  marking anything in italics that is marked as "finished--do not
+  expand anymore": 
+
+  <code>
+e$x {a..c}b "*$y" '$z'
+e$x {a..c}b "*$y" <i>$z</i>
+e<i>cho</i> {a..c}b "*<i>blah</i>" <i>$z</i>
+e<i>cho</i> {a..c}b <i>*blah $z</i>
+e<i>cho ab bb cb *blah $z
+echo ab bb cb *blah $z</i>
+  </code>
+
+And now finally the command is executed.  
+
+  </p>
+
+  <p>As a side remark, one way to see what is happening in, say, the
+  first example is to use strace:
+
+  <code>~/untie$ <b>strace echo *</b>
+execve("/usr/bin/echo", ["echo", "tf", "tfp", "tn", "tp", "tut"], [/* 23 vars */]) = 0
+...</code>
+
+  Here, we observe that as the echo program is started, it gets passed
+  as arguments
+
+  <code>["echo", "tf", "tfp", "tn", "tp", "tut"]</code>
+
+  So clearly echo is not interpreting the *.  Indeed: 
+
+  <code>~/untie$ <b>echo '*'</b>
+*</code>
+  </p>
+
+  <p>This order of processing provides a couple of ways you can get
+  accidentally burned.  For instance, recall that "rm" means "remove
+  all the regular files that get passed as arguments".  Thus "rm *"
+  will remove all files but will preserve any directories.  So maybe
+  you are in this situation: 
+
+  <code>~/untie/tev$ <b><cmd name="ls" /></b>
+dir1/   dir2/   file1   file2</code>
+
+  And you want to remove all the files but keep the directories dir1
+  and dir2.  Simple--you just 
+
+  <code>~/untie/tev$ <b><cmd name="rm" /> *</b>
+~/untie/tev$ <b><cmd name="ls" /></b>
+dir1/   dir2/</code>
+
+  Cat in a box.  But now let us change the setup slightly: 
+
+  <code>~/untie/tev$ <b>cd ../tever</b>
+~/untie/tever$ <b><cmd name="ls" /></b>
+-r   dir1/   dir2/   f1   f2   a9
+</code>
+
+Now, if we do "rm *", bash will expand the * FIRST, and then will run
+the command.  So rm * will be the same as running 
+
+<code><cmd name="rm" /> -r dir1 dir2 f1 f2 a9</code>
+
+  "-r", if you have forgotten, is the switch that tells rm to remove
+  directories as well as regular files, so this will clobber the
+  entire folder, rather than just its regular files!  </p>
+
+  <p>There are many ways to avoid this.  First, DON'T NAME YOUR FILES
+  '-r'.  Seriously.  Between this and '-f', that's asking--no,
+  begging--for trouble.  They're alphabetically before a-z, so this
+  will forever be a danger.  But if you end up in this situation and
+  want to remove the '-r' file that someone else maliciously created,
+  you are not out of luck.  </p>
+
+  <p>The problem is that rm doesn't know when the switches stop and
+  the actual arguments start, so it gets "rm -r dir1 ..." and just
+  happily treats -r as switch.  But there is a special notation that
+  tells programs `there are no switches after this point'.  "--".
+
+  <code>~/untie/tever$ <b><cmd name="ls" /></b>
+-r   dir1/   dir2/   f1   f2   a9
+~/untie/tever$ <b><cmd name="rm" /> -- *</b>
+~/untie/tever$ <b><cmd name="ls" /></b>
+dir1/   dir2/</code>
+
+
+  Of course, creating a file called "-r" might require knowing this
+  trick: 
+  <code>~/untie/tever$ <b><cmd name="touch" /> -r</b>
+touch: option requires an argument -- 'r'
+Try `touch --help' for more information.
+~/untie/tever$ <b><cmd name="touch" /> -- -r</b>
+~/untie/tever$ 
+</code>
+
+  </p>
+</item>
+<item name="multiple commands">
+  You can execute multiple commands on one command input by separating
+  them with a ";".  The commands will be executed in the order they
+  appear, and one command will not begin until the previous one has
+  finished.  
+
+  <code>
+    ~/untie$ <b>echo hello; ls; stat tf</b>
+hello
+tf  tfp  tn  tp  tut
+  File: 'tf'
+  Size: 16384     Blocks: 32         IO Block: 4096   directory
+  Device: 803h/2051d    Inode: 13213967    Links: 2
+Access: (0755/drwxr-xr-x)  Uid: ( 1000/    potato)   Gid: ( 1000/   potato)
+Access: 2013-11-16 17:46:20.464561091 -0600
+Modify: 2013-11-14 17:56:46.507307491 -0600
+Change: 2013-11-14 17:56:46.507307491 -0600
+ Birth: -
+  </code>
+</item>
+<item name="conditionals">
+  <item name="return values">
+    <p>Every program, when it finishes, returns a number, called the
+    "return value".  By convention, if the program executes
+    successfully the return value will be 0, and if there is an error,
+    this number will be something nonzero that depends on which error
+    occurred.  The return value of the most recently run program is
+    stored in the variable called "?".  
+
+    <code>~/untie$ <b>echo hello</b>
+hello
+~/untie$ <b>echo $?</b>
+0
+~/untie$ <b>cd tf</b>
+~/untie/tf$ <b>ls aa</b>
+aa
+~/untie/tf$ <b>echo $?</b>
+0
+~/untie/tf$ <b>ls 22</b>
+ls: cannot access 22: No such file or directory
+~/untie/tf$ <b>echo $?</b>
+2
+~/untie/tf$ <b>cat 22</b>
+cat: 22: No such file or directory
+~/untie/tf$ <b>echo $?</b>
+1</code>
+
+So apparently ls returns a 2 if it couldn't find the file, whereas cat
+returns a 1 in that case.  
+    </p>
+  </item>
+  <item name="&amp;&amp;">
+    <p>Recall that to execute multiple commands in sequence on one
+    line, you separate them with ;.  If you want to execute multiple
+    commands in sequence, but want the second command to execute only
+    if the first command succeeded--that is, had a return value of
+    0--you can instead separate them with &amp;&amp;.
+  
+    <code>~/untie/tf$ <b>echo hello &amp;&amp; ls aa</b>
+hello
+aa
+~/untie/tf$ <b>echo $?</b>
+0
+~/untie/tf$ <b>ls aa &amp;&amp; cat aa</b>
+aa
+blah
+~/untie/tf$ <b>ls 12; cat 12; echo $?</b>
+ls: cannot access 12: No such file or directory
+cat: 12: No such file or directory
+1
+~/untie/tf$ <b>ls 12 &amp;&amp; cat 12; echo $?</b>
+ls: cannot access 12: No such file or directory
+2</code>
+
+As you can see from this example, the return value of the combined
+command is 0 if everything went to plan and all commands in the chain
+completed successfully, and if something fails, then the return value
+of the entire chain is whatever nonzero value that last failing
+command returned.  
+    </p>
+  </item>
+  <item name="||">
+    <p>Much in the spirit of &amp;&amp; is ||, which will execute all
+    the commands in the sequence and return 0 if any one of them
+    succeeded.  If all commands fail, the return value of the chain
+    will be that of the last command in the chain.  
+  
+    <code>~/untie/tf$ <b>ls aa || cat aa; echo $?</b>
+aa
+blah
+0
+~/untie/tf$ <b>ls 12 || cat 12; echo $?</b>
+ls: cannot access 12: No such file or directory
+cat: 12: No such file or directory
+1
+~/untie/tf$ <b>ls 12 &amp;&amp; cat 12; echo $?</b>
+ls: cannot access 12: No such file or directory
+2</code>
+
+The operators are left-associative: 
+
+<code>~/untie/tf$ <b>echo hello || ls 12 &amp;&amp; cat 12; echo $?</b>
+hello
+cat: 12: No such file or directory
+1
+</code>
+    </p>
+  </item>
+  <item name="test">
+    <p>&amp;&amp; and || would give us a very nice way of doign
+    conditional execution provided we had some program that would
+    perform various tests/comparisons and set the return value
+    accordingly.  Happily, we do!  It is called 'test'.</p>
+
+    <p>The various tests it can perform are documented in its manpage,
+    so we'll not list them here, but only give some examples and
+    warnings: 
+    
+    <code>~/untie/tf$ <b>test 4 -gt 2; echo hello</b>
+hello
+~/untie/tf$ <b>test 4 -gt 5 &amp;&amp; echo hello</b>
+~/untie/tf$ <b>test 4 -eq 5 &amp;&amp; echo hello</b>
+~/untie/tf$ <b>test 4 -eq 4 &amp;&amp; echo hello</b>
+hello
+~/untie/tf$ <b>test hello = blah &amp;&amp; echo boom</b>
+~/untie/tf$ <b>x=$(ls | head -n 1) &amp;&amp; test $x = aa; echo boom</b>
+boom
+~/untie/tf$ <b>x=ac &amp;&amp; test -e $x; echo boom</b>
+boom
+~/untie/tf$ <b>x=hu &amp;&amp; test -e $x; echo boom</b>
+~/untie/tf$ <b>x=hu &amp;&amp; test ! -e $x; echo boom</b>
+boom
+~/untie/tf$ <b>test hello= blah &amp;&amp; echo boom</b>
+-bash: test: hello=: unary operator expected
+~/untie/tf$ <b>test hello=blah &amp;&amp; echo boom</b>
+boom</code>
+
+    Wait--what happened with those last two?  The last one is easy:
+    test does not parse any strings it receives--it assumes its
+    arguments are of a certain form, e.g. "first argument is a string,
+    second argument is an "=", third argument is a string".  It finds
+    which test matches the form of the arguments it got, and then
+    performs that.  In the case of the last test, bash doesn't split
+    the string hello=blah because "=" is not in IFS (recall that
+    strings are only split into separate tokens if the are separated
+    by some character in $IFS).  Thus test receives only one argument,
+    and as its manpage suggests, this is equivalent to 
+
+    <code>~/untie/tf$ <b>test -n hello=blah</b></code>
+    
+    That is, it is merely testing whether the string "hello=blah" is
+    nonempty, which of course it is.  </p>
+    
+    <p>What about the penultimate example then?  Here, test has
+    received two arguments--"hello=" and "blah".  When it has two
+    arguments, it expects the first one to be a unary operator, like
+    "-e" or such--an operator that takes only one argument.  Instead
+    it finds the nonsense "hello=" and flips out.  </p>
+  </item>
+  <item name="[[]]">
+    <p>There is a nice syntactic sugar for tests, namely, rather than
+    writing 
+
+    <code>~/untie$ <b>test some test stuff</b></code>
+    
+    You may instead write: 
+    
+    <code>~/untie$ <b>[[ some test stuff ]]</b></code>
+
+    (Single square brackets are equivalent in most cases--some
+    bash-like shells support only [] and not [[]], but in bash, []
+    does not accept some of the tests that [[]] does.)
+
+    So now we can construct complicated tests: 
+
+    <code>~/untie/tf$ <b>[[ -e hu ]] &amp;&amp; echo Yay</b>
+~/untie/tf$ <b>[[ -e aa || -e hu ]] || cat 12 &amp;&amp; echo Yay</b>
+Yay
+</code>
+
+    It should be noted that the spaces are very important: Bash
+    treats "[[" as a command, much like test, except it looks for the
+    matching "]]" token to denote the end of the test.  Thus: 
+
+    <code>~/untie$ <b>[[-e hu]]</b>
+-bash: [[-e: command not found</code>
+
+    Will be interpreted by bash as two tokens: "[[-e" and "hu]]".
+    Since "[[-e" isn't a valid command, bash will error out as we observe.
+
+    </p>
+  </item>
+</item>
+<item name="file descriptors">
+  <p>This isn't actually a bash concept but rather an OS concept, but
+  it is important for us.  Whenever a program wants to read a file, it
+  asks the OS to open the file (it issues the "open" syscall).  The OS
+  then checks whether the program has permissions to read the file,
+  that the file actually exists, etc., and if all is in order, it
+  creates an entry in the list of files that this program has open.
+  This list contains information like an actual reference to the file,
+  and the current location in the file where the program is reading
+  from.  A "file descriptor" is just a number, which is supposed to be
+  an index in this list of open files.  </p>
+
+  <p>For instance, if I have three files open, then I can read the
+  second one I opened by telling the OS `read 5 bytes from file
+  descriptor 1'.  In practice, every program gets three files open for
+  it automatically, which are therefore file descriptors 0, 1, and 2,
+  which are referred to as "stdin" ("standard in"), "stdout", and
+  "stderr" respectively.  When a program writes to stdout or stderr,
+  the OS will print whatever data was written to the terminal that the
+  program was launched from.  You can see this happening with strace: 
+
+  <code>~/untie$ strace -e write echo hello 3&lt;&gt;/dev/null 1>&amp;3
+write(1, "hello\n", 6)                  = 6
+  </code>
+  
+  (We have some cruft at the end of the line to avoid interleaving the
+  strace output with the actual "hello" that gets echoed--feel free to
+  ignore this or otherwise to puzzle your way through it using the <a
+  href="#redirection">redirection</a> reference below.)</p>
+
+  <p>This shows that "echo hello" issues one write command to the OS,
+  and it writes the 6 bytes "hello\n" to file descriptor 1, which is
+  stdout.  And indeed, when we do echo hello, we see "hello" appear in
+  the terminal.  </p>
+
+  <p>Likewise, when a program just waits for you to type stuff into
+  the terminal, it is reading from stdin.  An example of this is grep:
+  If you enter the command 
+  
+  <code>~/untie$ grep lo</code>
+
+  into the terminal, it will read from stdin, i.e. it will wait for
+  you to enter stuff, and then it will echo back any lines that you
+  entered that matched the expression--in this case, "lo".  For
+  clarity, we denote in bold anything we entered:
+
+  <code>~/untie$ <b>grep lo
+hallo</b>
+hallo
+<b>blah
+long</b>
+long
+</code>
+
+This might seem useless, but rather than type stuff in, we can feed in
+the output of another program to grep and that will be read from stdin
+instead.  So, for instance, here we make printf output
+"hello\nblah\nlong\n" and then feed this into grep through a pipe (see
+below), and indeed we observe that grep does read these lines from
+file descriptor 0 (i.e. stdin), and then writes the matching lines to
+file descriptor 1 (stdout): 
+
+<code>printf 'hallo\nblah\nlong\n' | strace -e read,write grep lo 3&lt;>/dev/null 1>&amp;3
+...
+read(0, "hallo\nblah\nlong\n", 32768)   = 16
+read(0, "", 32768)                      = 0
+write(1, "hallo\nlong\n", 11)           = 11
+</code>
+
+  </p>
+</item>
+<item name="pipelines">
+  The most powerful feature of bash is that it lets you use multiple
+  programs in concert to do tasks that none of the programs
+  individually could accomplish.  The main mechanism for doing this is
+  pipelining.  What it looks like is:
+
+  <code>program1 | program2 | program3 | program4</code>
+
+  When you enter a sequence like this, what happens is that an
+  instance of each of the programs involved is started, but the stdout
+  of program1 is fed into the stdin of program2, etc.  This is what
+  enables 
+
+  <code>printf 'hallo\nblah\nlong\n' | grep lo</code>
+
+  to work, since 'hallo\nblah\nlong\n' goes out on printf's fd 1
+  (stdout), and grep reads from grep's fd 0, but the pipe means that
+  writes to printf's fd 1 can be read from grep's fd 0, so grep indeed
+  gets the three lines.  
+
+  You can watch this happen thus: 
+
+<code>
+~/untie$ strace -e read,write,pipe,dup2 -f bash -c 'printf "hallo\nblah\nlong\n" | grep lo > /dev/null'
+...
+pipe([3, 4])                            = 0 <b>bash links fd 3 to fd 4</b>
+Process 31690 attached                      <b>This is the printf process</b>
+Process 31691 attached                      <b>This is the grep process</b>
+[pid 31690] dup2(4, 1)                  = 1 <b>printf's stdout gets linked to fd 4</b>
+[pid 31691] dup2(3, 0)                  = 0 <b>grep's stdin gets linked to fd 3</b>
+[pid 31690] write(1, "hallo\n", 6)      = 6
+[pid 31690] write(1, "blah\n", 5)       = 5
+[pid 31690] write(1, "long\n", 5)       = 5
+[pid 31690] +++ exited with 0 +++
+[pid 31691] dup2(3, 1)                  = 1
+...
+[pid 31691] read(0, "hallo\nblah\nlong\n", 32768) = 16
+[pid 31691] read(0, "", 32768)          = 0
+[pid 31691] write(1, "hallo\nlong\n", 11) = 11
+[pid 31691] +++ exited with 0 +++
+--- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=31690,
+si_status=0, si_utime=0, si_stime=0} ---
++++ exited with 0 +++
+</code>
+</item>
+<item name="subshells">
+  <item name="()"></item>
+  <item name="{}"></item>
+  <item name="loops in pipelines"></item>
+</item>
+<item name="variables">
+  <item name="="></item>
+  <item name="$"></item>
+  <item name="let"></item>
+  <item name="read"></item>
+  <item name="environment variables">
+    <item name="export"></item>
+    <item name="$RANDOM"></item>
+    <item name="$IFS"></item>
+    <item name="$PS1 and $PS2"></item>
+  </item>
+  <item name="special variables">
+    <item name="$?"></item>
+    <item name="$!"></item>
+    <item name="$@"></item>
+  </item>
+</item>
+<item name="flow control">
+  <item name="switch"></item>
+  <item name="for"></item>
+  <item name="while"></item>
+  <item name="if"></item>
+</item>
+<item name="functions">
+</item>
+<item name="redirection">
+  <item name="&gt;&gt;"></item>
+  <item name="&gt;"></item>
+  <item name="&lt;"></item>
+  <item name="&lt;&gt;"></item>
+  <item name="&amp;n"></item>
+  <item name="&amp;-"></item>
+  <item name="redirection and subshells">
+    <code>~/untie$ diff &lt;(cat file1 | grep '^a') &lt;(cat file2 | grep '^a')</code>
+  </item>
+</item>
+<item name="jobs">
+  <item name="C-z"></item>
+  <item name="&amp;"></item>
+  <item name="fg"></item>
+  <item name="bg"></item>
+</item>
+<item name="signals">
+  <item name="C-c"></item>
+  <item name="trap"></item>
+</item>
+</items>
+</page>

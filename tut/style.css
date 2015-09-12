@@ -1,0 +1,73 @@
+div.all{
+	margin: 20px auto;
+	width: 80%;
+}
+div.header{
+    font: bold 1.5em "Monospace";
+    height: 1.5em;
+    margin: auto;
+    width: 80%;
+    padding-left:60px;
+}
+div.header a{
+    text-decoration: none;
+}
+div.menu_item{
+	margin: 0;
+	height: 1.25em;
+	padding: .2em;
+}
+div.menu_item a.current{
+	color: #000000;
+	text-decoration: none;
+	font: bold 1.0em "Monospace";
+}
+div.menu_item a.other{
+	color: #0055cc;
+	text-decoration: none;
+	font: 1.0em "Monospace";
+}
+div.menu_item a:hover{
+	color: #c5c;
+}
+
+a.pre {
+	color: #036;
+	text-decoration: none;
+}
+
+a:not(.pre) {
+	color: #0055cc;
+	text-decoration: none;
+	font: 1.0em "Monospace";
+}
+h3{
+	font: bold 1.5em "Monospace";
+	margin-top: 0px;
+}
+
+div.menu_item{
+	
+}
+div.menu{
+	float:left;
+	padding:20px;
+	margin: 0 10px;
+	//border: 1px #000 solid;
+	background-color: #fff;
+	min-width:180px;
+}
+div.content{
+	padding:20px 20px 0 20px;
+	font: 1em "Serif";
+	margin-left:231px;
+	min-width:30em;
+}
+div.codebox{
+	background-color: #ccf;
+	margin:5px 0 5px 0;
+	padding:2px 0 2px 20px;
+	font: 1em "Monospace";
+	border: 1px #000 dashed;
+}
+	

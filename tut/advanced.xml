@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet href="style.xsl" type="text/xsl"?>
+<page title="Advanced Tutorial" uri="advanced.xml">
+<h3>Advanced Tutorial</h3>
+<p>This tutorial contains the following: 
+
+<ul>
+<li><b><a href="philosophy.xml">UNIX Philosophy: </a></b>Now that you know the basics, we'll
+examine somewhat more closely the principles that underlie certain
+otherwise confusing features in what follows</li>
+<li><b><a href="tasks.xml">Guided tasks: </a></b>We'll continue in the vein of the basic
+guided tasks, but now with tasks that illustrate some more advanced
+bash concepts such as output redirection and more complicated control
+flow.</li>
+<li><b><a href="examples.xml">Exercises: </a></b>As before, some further tasks, except now with
+only a few possible answers and minimal commentary provided.</li>
+</ul></p>
+</page>

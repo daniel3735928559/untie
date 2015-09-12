@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet href="style.xsl" type="text/xsl"?>
+<page title="Tasks" uri="basic.xml">
+<items name="Basic Tasks">
+  <item name="Some utilities">
+      I assume you've read the intro and know how to navigate
+      directories and files.  Now we'll see some examples of how to
+      inspect the contents of files, search through files, etc.,
+      starting with the most basic such utility, cat: 
+    <item name="cat">
+      <p>The program cat is very simple: it reads whatever file you
+      tell it to, and prints each line to the terminal.</p>
+
+      <p>To use cat, for a start, just type it in at the command
+      prompt and hit enter.  The terminal will then await further
+      input, so type whatever comes to mind and hit enter at your
+      leisure.  Whatever you typed should be outputted on the next
+      line, and then cat will wait for more input.
+
+<code>~/untie/t1$ <b><cmd name="cat" />
+hello cake</b><red>        This is in bold because you typed it in</red>
+hello cake        <red>The above is in red because it is commentary and won't actually appear in your terminal
+</red>
+<b>baaskd</b>
+baaskd</code>
+
+      When you tire of this, which I trust will happen relatively
+      quickly, hit Ctrl-c (henceforth C-c) to exit cat and return to
+      the prompt.  </p>
+
+      <p>Wait a minute--We said cat reads a file and prints that out?
+      That's not what happened above!  For one thing, we never told it
+      which file to read!  We can look for an actual file and pass
+      that to cat as an argument: 
+
+
+<code>~/untie/t1$ <b><cmd name="ls" /></b>
+a  b  c
+~/untie/t1$ <b><cmd name="cat" /></b> a
+qwe asd zxc rty fgh vbn
+qaz wsx edc rfv tgb yhn
+pl ok
+ij uh
+</code>
+
+      Ah--that's more like it.  What's being outputted there is the
+      content of the file "a".  You can similarly inspect the other
+      files one by one, or you can inspect them all by telling cat to
+      output them all!
+
+<code>~/untie/t1$ <b><cmd name="cat" /></b> a b c
+qwe asd zxc rty fgh vbn
+qaz wsx edc rfv tgb yhn
+pl ok
+ij uh
+151515151515151515151515151515151515151c
+erererererererererec
+c9c9c
+handlers
+retrieved
+appealers
+catalytic
+twinning
+seance
+</code>
+
+      You note that cat outputs all the files without delimiters
+      indicating where one files stops and the other starts.  This is
+      intentional and often useful.  </p>
+
+      <p>Now, remember the first example where we didn't give cat a
+      file to read?  It turns out that if you don't specify a file,
+      cat has a default file that it will read from.  This file is
+      normally referred to as "standard in" or "standard input", or
+      often just "stdin" for short.  You can name this file explicitly
+      by referring to /dev/stdin.  In particular "cat /dev/stdin" will
+      produce the same result as "cat" alone.  </p>
+
+      <p>When any program reads from thie file, normally the terminal
+      will wait for your input, and whenever you hit enter, the
+      program will be fed whatever line you entered.  Since cat reads
+      a file and outputs whatever it read, it prints out the line you
+      just entered, since that's what it read from stdin.  And since
+      what cat does is to keep reading from a file until it reaches
+      the end or until it is terminated, after it outputs what you
+      entered it issues another read command to stdin, causing it to
+      wait for another line from you, and so on until you use C-c to
+      terminate cat by hand.  </p>
+    </item>
+    <item name="grep">
+      <p>There is a similar program called grep which does the same thing
+      as cat, namely it reads lines from a file (or from stdin if you
+      don't give it a file).  But rather than blindly printing every
+      line it reads, it only prints those that match a pattern you
+      give it.  
+
+<code>~/untie/t1$ <b><cmd name="grep" /> cc
+hello cake
+hello ccake</b>
+hello ccake
+<b>baaskd</b>
+<b>aabbccdd</b>
+aabbccdd</code>
+
+      Once again, C-c will terminate grep.  You notice that just like
+      cat before, grep read your input from stdin.  But unlike cat,
+      whose job is to output everything it reads, grep only outputted
+      lines that contained the string "cc".</p>
+
+      <p>Much like cat, a common use of grep is not to search stdin,
+      but to search a specified file: 
+
+<code>~/untie/t1$ <b><cmd name="grep" /> .t c</b>
+retrieved
+catalytic
+</code>
+
+      The character ".", when it appears in a pattern, means "any
+      single character", so this line searched the file "c" for any
+      line with any character followed by a t.  In particular, it
+      skipped the line "twinning" because the t is not preceeded by
+      any character.</p>
+
+      <p>So we see that when we invoke grep, its first argument is the
+      pattern it will search for, and any subsequent arguments are
+      files that it will search through.  But before the pattern, we
+      are allowed to place "switches"--that is, arguments that begin
+      with the "-" character that modify the behaviour of grep.  The
+      first one we'll look at is the "-v" switch, which causes grep to
+      output all lines <i>not</i> matching the pattern given:
+
+<code>~/untie/t1$ <b><cmd name="grep" /> -v .t c</b>
+handlers
+appealers
+twinning
+seance
+</code>
+
+      And we see all the lines that the previous grep did not print.
+      </p>
+
+      <p>The <cmd name="grep" /> entry has more info about basic
+      switches you might find useful and the manpage has a
+      comprehensive list, but I want to return for the moment to the
+      first stupid-looking example where we searched stdin.  </p>
+    </item>
+  </item>
+  
+  <item name="Generate a random diceware password">
+    <p>Do you use the same password for everything and feel slightly
+    guilty about it?  Want to get decently memorable and decently
+    secure passwords quickly?  Then you need diceware!  For only three
+    easy payments of--Um...hi.  Sorry.  Got carried away there.  But
+    for serious, <a
+    href="http://world.std.com/~reinhold/diceware.html">diceware</a>
+    is a password-generating scheme that satisfies the proposed
+    conditions.  In brief, the scheme is that you select some number
+    of random words (4 is decent, 5 is good) and smash them together
+    to get your password.  If the password is required to have capital
+    letters, numbers, punctuation, etc., just pick a combination of
+    characters like 0,O that is easy to remember, adequately expresses
+    your skepticism with this security policy, and contains all three.
+    Append that to every password you generate.  You've already got
+    the entropy from the random words, so even if someone knows this
+    is your scheme they still have substantial cracking to do.
+    </p>
+
+    <p>When we say `pick random words', we do mean something more than
+    `write down the first five words you think of'.  You--yes you, no
+    I really don't care who you are--you are far more predictable than
+    you think, and selections that you influence will contain
+    measurable biases that could be used to get your password.  To
+    eliminate this bias, the diceware page suggests you use a die pick
+    the words.  This is definitely good enough, even though
+    (supposedly?) an ordinary die also has slight biases.  Or you
+    could make the computer select the words randomly, provided its
+    source of randomness is good enough, and just promise yourself
+    that you will take the first output it gives you (else you are
+    giving your biases a way to creep in and help the crackers).  </p>
+
+    <p>We'll go through the latter of these approaches.  We've
+    included the diceware words file as dw/w.  To use it, we want 5
+    random lines from the file, but unfortunately, first, the file has
+    some cruft in it, namely the PGP signature and the numbers that
+    correspond to die rolls.</p>
+
+    <item name="Verify the word file signature">
+
+    <p>Since we're talking about good security practices, we should
+    perhaps actually verify the signature.  All we really need is any
+    long list of short English words, and the specific words may not
+    matter so much, so feel free to skip this step, but it's nice to
+    know how to do for when it does matter.</p>
+
+    <p>You should have a program called gpg installed that is able to
+    manage encryption keys.  It stores all the keys it knows about in
+    its "keyring".  You can see all the keys you have so far with 
+
+    <code>~untie/dw$ <b>gpg --list-keys</b></code>
+
+    You might not have any.  This is fine, but you need to get a key
+    in your keyring before you can use it.  So we'll get this author's
+    public key from one of the many public key servers out there--for
+    example, <a
+    href="http://stinkfoot.org:11371/pks/lookup?op=get&amp;search=0x6B6BB82DAC3184A1">here</a>.
+    Copy all the text inside and including the delimiters
+
+    <code>
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+...
+-----END PGP PUBLIC KEY BLOCK-----
+    </code>
+
+    into a file called ars.key and then do
+
+    <code>~untie/dw$ <b>gpg --import ars.key</b></code>
+
+    Now the key should show up when you list-keys.  You can get some
+    small assurance that it is the author's by comparing its
+    fingerprint--outputted by 
+
+    <code>~untie/dw$ <b>gpg --fingerprint reinhold</b></code>
+
+    And comparing the output with the fingerprint on the author's <a
+    href="http://world.std.com/~reinhold/">website</a>.  </p>
+
+    <p>Having done this, verifying the message is easy: 
+
+    <code>~/untie/dw$ <b>gpg --verify w</b>
+gpg: Signature made Mon Feb  5 10:39:46 2001 CST using RSA key ID AC3184A1
+gpg: Good signature from "Arnold G. Reinhold &lt;reinhold@world.std.com>"
+gpg: WARNING: This key is not certified with a trusted signature!
+gpg:          There is no indication that the signature belongs to the owner.
+Primary key fingerprint: FA C3 82 FB 05 5E 03 1A  34 04 79 EA 9E 76 7B 67
+    </code>
+
+    gpg helpfully alerts you that all you've done is checked that some
+    untrusted file matches some untrusted key with a fingerprint that
+    matches some untrusted website.  If you actually trust the website
+    (and the website's host, the keyserver, your ISP, other people on
+    your LAN, among many others) then this is decent assurance that
+    the message came through as the author intended.  For greater
+    assurance, you could, for instance, confirm the author's ID in
+    person and have him give you the fingerprint on a slip of
+    paper.</p>
+
+    <p>Likely adequately satisfied, we can get gpg to extract the
+    message with the `decrypt' command: 
+
+
+    <code>~/untie/dw$ <b>gpg --decrypt w</b></code>
+
+    This will output the whole file.  You want instead to put this
+    output not in your terminal window but in a new file.  So you can
+    use <a href="bash.xml#redirects">redirects</a>.  To wit: 
+
+    <code>~/untie/dw$ <b>gpg --decrypt w >> wordlist</b></code> 
+
+    Now you have the word list without the signature, and are
+    reasonably confident (subject to trusting various intermediaries)
+    that the file is what the author intended to give you.  But it's
+    still got those numbers.  
+    </p>
+
+    </item>
+    <item name="Cleaning all but the words">
+      <p>To get rid of the numbers, we can use sed.  We want some way
+      to say "Always delete from the beginning of the line until the
+      last whitespate character".  </p>
+    </item>
+    <item name="Removing undesirable words">
+      <p></p>
+    </item>
+    <item name="Generating passwords">
+      <p>We now have a list of words, and we want to get 5 of them at
+      random.  The pieces are: <cmd name="cat" /> will output an
+      entire file.  <cmd name="head" /> will output a specified number
+      of lines of its input.  <cmd name="shuf" /> will output every
+      line of its input, but in a random order.  <cmd name="tr" /> can
+      be used to change or delete certain characters from its input.
+      So our strategy is: Output the entire file.  Feed it to shuf,
+      which will output its lines in a random order.  Then feed the
+      output of that to head to print only the first 5 lines.  Then
+      finally, feed that to tr to delete the newlines.  Thus: 
+
+      <code>~/untie/dw$ <b>cat wordlist | shuf | head -n 5 | tr -d '\n'</b></code> 
+
+      Ta da!  But careful!  Remember we were being careful about how
+      randomly the words were selected?  By default, shuf makes its
+      random shuffles using a random number based only on the current
+      time!  So if someone knows at which millisecond you made the
+      password, they have your password!  A month is only 2 billion
+      milliseconds, and a computer can do 2 billion operations per
+      second, so in practice, which month you made your password in is
+      already useful information.</p>
+
+      <p>Happily, your computer has a better source of random numbers,
+      namely a file called /dev/random.  You can tell shuf to use this
+      like so: 
+
+      <code>~/untie/dw$ <b>cat wordlist | shuf --random-source=/dev/random | head -n 5 | tr -d '\n'</b></code> 
+    
+      This may be somewhat slow, but if you're not generating
+      passwords particularly often, this may be acceptable.
+      /dev/urandom is a faster (if less secure) random number
+      generator, so for some throwaway application, you might use
+      that.  
+      </p>
+    </item>
+    <item name="Packaging this as a script">
+      <p>It's all well and good to paste in that script above every
+      time you need a password, but since it is something that might
+      come up every now and again.  So you can store the script in a
+      file and just run that file when you need a password.  </p>
+    </item>
+  </item>
+  <item name="Manage a coding project">
+    <item name="Compute number of lines of code in a project">
+      wc, nl, to exclude comments, use sed or grep
+    </item>
+    <item name="Globally replace all instances of 'PLACEHOLDER' with 'yogurt'">
+      sed -i
+    </item>
+    <item name="Compile all files associated with the project">
+      gcc, globbing
+    </item>
+    <item name="Delete all files that contain the string 'DELETEMENOW'">
+      for, grep, if.  Alternatively, grep -H, sed, while read x, or else
+      xargs.
+    </item>
+    <item name="Find all files where the variable notacat is mentioned">
+      for, grep
+    </item>
+  </item>
+  <item name="Find out what is taking up all your disk space">
+    <item name="Find the largest file in the directory">
+      ls, sort, stat
+    </item>
+    <item name="Find which subdirectory is taking up the most space">
+      du, sort -h
+    </item>
+    <item name="Write a script that tests if a file has size bigger than a given argument">
+      conditionals, substitution, stat
+    </item>
+  </item>
+  <item name="Get a list of IPs that visited a website">
+    sort, uniq
+  </item>
+  <item name="Write a double echo script">
+    echo $1 $1; echo $@ $@; script arguments
+  </item>
+  <item name="Write a script that doubles the input">
+    echo $((2*$1))
+  </item>
+  <item name="Write a countdown script">
+    echo, sleep, while loops, arithmetic
+  </item>
+</items>
+</page>

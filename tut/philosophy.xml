@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet href="style.xsl" type="text/xsl"?>
+<page title="Introduction" uri="philosophy.xml">
+
+<items name="Philosophy">
+
+<item name="To a computer, everything is a number"><p> When you think
+of using a computer, your mind may jump to documents, images, all
+arranged in folders on a desktop.  However from the perspective of
+your CPU, there is a chip near to it on the motherboard whose sole job
+is to store a huge array of about 4 billion bytes (that is, numbers
+between 0 and 255).  When you press keys and click the mouse, certain
+numbers in this array change.  The CPU then runs some code that
+updates the matrix of little lights you're currently staring at to
+reflect some response to your actions.  Because the patterns of lights
+resemble folder icons and Roman letters and pictures of your cat, you
+can reasonably think about using a computer in these high-level terms
+manage to post your cat picture to imgur.  These abstractions are
+useful in that because of them, your parents can (maybe) send you
+email.  However, we're on a journey to the centre of your computer,
+and it behooves us to try to think more closely to the way things
+actually are.</p>
+
+<p>As a matter of convenience, when we refer to the values of certain
+bytes, we will frequently write them in base 16--hexadecmial--rather
+than base-10.  This is a somewhat unavoidable feature of talking about
+computers at a low level, so if this makes you uncomfortable, maybe
+read the Wikipedia article, and otherwise just remember that a3 is
+just a number--another way of writing what you'd call 163, and so in
+particular nothing more than an ordinary number.  Nothing scary.</p>
+
+<p>One example of our new perspective is that every program is just a
+sequence of numbers.  A CPU, then, is a machine for reading in these
+numbers, interpreting them as instructions to (sometimes) add,
+multiply, store, or otherwise mogrify other numbers in this huge
+array.  For instance, maybe the number 1a means `read in the next byte
+and store it in the address described by the next four bytes.  So when
+the processor gets to a point in RAM where the next few bytes look
+like:
+
+<code>1a 33 ff 01 00 00</code>
+
+At this point the value 33 will be written to slot 1ff in RAM.  </p>
+
+<p>We'll discuss and/or allude to this idea later, but keep this in
+the back of your mind.  So if ever you worry `This is a sound file--how
+can I send it over a network?' you can remember that the sound file,
+like everything else, is just a bunch of numbers, and if you can move
+any numbers over a network, you can move these.</p>
+
+</item>
+
+<item name="In Unix, everything is a file"><p>This is usually touted
+as Unix principle number 1.  "Everything is a file."  Let us break it
+down: </p>
+
+
+<item brief="yes" name="Everything"><p>On hearing the slogan you might ask:
+`So...what, my computer is a file?  My mouse is a file?  The cursor on
+the screen is a file?  The colour blue is a file?'  By `everything' we
+mean `all the objects that the computer has to keep track of'.  For
+instance, all your pictures, missives, recordings of you singing that
+would make excellent blackmail material, all those are files.  </p>
+
+<p>But so is your mouse, in the following sense: You have a program
+running called X that is displaying windows and icons and panels and
+buttons.  X is also displaying the mouse cursor.  How does it know
+where to show it?  There is a file, called /dev/input/event1 that it
+is constantly reading from.  If you have the right permissions, you
+can read from this file alongside your window manager by executing the
+following command and then moving the mouse around a bit:
+
+<code>~/# cat /dev/input/event1 | hexdump -C
+00000000  e2 28 85 52 00 00 00 00  83 70 0d 00 00 00 00 00  |.(.R.....p......|
+00000010  02 00 00 00 01 00 00 00  e2 28 85 52 00 00 00 00  |.........(.R....|
+00000020  83 70 0d 00 00 00 00 00  00 00 00 00 00 00 00 00  |.p..............|
+00000030  e2 28 85 52 00 00 00 00  07 af 0d 00 00 00 00 00  |.(.R............|
+00000040  02 00 01 00 ff ff ff ff  e2 28 85 52 00 00 00 00  |.........(.R....|
+00000050  07 af 0d 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+00000060  e2 28 85 52 00 00 00 00  85 ed 0d 00 00 00 00 00  |.(.R............|
+00000070  02 00 01 00 01 00 00 00  e2 28 85 52 00 00 00 00  |.........(.R....|
+00000080  85 ed 0d 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+00000090  e2 28 85 52 00 00 00 00  dd 0c 0e 00 00 00 00 00  |.(.R............|
+000000a0  02 00 01 00 02 00 00 00  e2 28 85 52 00 00 00 00  |.........(.R....|
+000000b0  dd 0c 0e 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+000000c0  e2 28 85 52 00 00 00 00  14 2c 0e 00 00 00 00 00  |.(.R.....,......|
+000000d0  02 00 00 00 0e 00 00 00  e2 28 85 52 00 00 00 00  |.........(.R....|
+000000e0  14 2c 0e 00 00 00 00 00  02 00 01 00 f6 ff ff ff  |.,..............|
+000000f0  e2 28 85 52 00 00 00 00  14 2c 0e 00 00 00 00 00  |.(.R.....,......|
+00000100  00 00 00 00 00 00 00 00  e2 28 85 52 00 00 00 00  |.........(.R....|
+00000110  53 4b 0e 00 00 00 00 00  02 00 00 00 13 00 00 00  |SK..............|
+...
+</code>
+
+When X reads /dev/input/event1, it gets 48 numbers for each mouse
+event.  Some of these numbers stand for `what happened' (move, button
+press, mouse wheel, etc.), some stand for how much it moved, some
+stand for the time this event happened, etc.  Above are the numbers
+for six `mouse moved' events.  So in this sense, your mouse is indeed
+a file: All interactions with the mouse happen by programs reading a
+file.</p>
+</item>
+
+<item name="Is"><p>The singular, present, second- or third-person form
+of the verb `to be'.  What do I look like, a philosophy textbook?</p></item>
+
+<item name="A"><p>Remember how we said your mouse is a file?  This is
+correct in that you can read this file and see the data about the
+mouse's behaviour streaming in.  But this is quite different from the
+files you're used to--when you have a text document file, you can read
+the first 10 letters from this file and they will always be the same: 
+
+<code>~/untie$ dd if=tut/commands.xml bs=10 count=1 status=none; echo
+&lt;?xml vers
+~/untie$ dd if=tut/commands.xml bs=10 count=1 status=none; echo
+&lt;?xml vers
+~/untie$ dd if=tut/commands.xml bs=10 count=1 status=none; echo
+&lt;?xml vers
+</code>
+
+whereas the mouse file, if we read the first 10 bytes of it, we'll get
+a different thing each time, namely the first 10 numbers describing
+the next mouse movement.  So with so many generations of Unix
+detractors we can agree on the slogan "Everything is a file, except
+when it isn't."  </p>
+
+<p>In fact, while everything is a file, files come in different types.
+Files like your vacation photos are called `regular files'.  A
+directory is an honestly different sort of file: 
+
+<code>~/untie$ cat tut
+cat: tut: Is a directory</code>
+
+It isn't secretly just a bunch of text listing which files are inside
+it, it is actually its own type of file.  /dev/input/event1 is another
+sort of file still, called a character device.  There are also block
+devices, and fifos, and so forth, but the takeaway for this moment is
+that not all files behave in the same way, but almost all the files
+you will ever care about are either regular files or directories.</p>
+
+</item>
+
+<item brief="yes" name="File"><p>A `file', most basically, is an
+entity that you can read from and write to.  A regular file is, as
+we've seen, a static sequence of bytes on your hard drive that doesn't
+change unless you go and explicitly change them.  If instead you read
+from your mouse event file, you'll get no bytes until the mouse moves,
+at which point you'll get bytes telling you how the mouse moved.  </p>
+
+<p>But even for regular files, you might be used to thinking of a file
+in terms of how you use it: c.mp3 is a recording of Pachelbel's Canon
+in D, lop.jpg is a photo of--well, let's not talk about that.  But in
+reality, just as the mouse events are described by a sequence of
+bytes, every regular file is just a sequence of bytes.  If you've ever
+opened an image with Notepad (on Windows) or nano (on Linux) you've
+seen that your autumn sunset looks like just gibberish text.  But even
+this is not quite right: When nano reads a file, it interprets the
+numbers as letters according to the <a href="ascii.html">ascii
+table</a>.  And you notice that while you can have bytes ranging from
+0-255, only bytes in the range 32-120 (plus a few others) actually
+make sense as English characters, so the rest come out as gibberish.
+</p>
+
+<p>So just as your image viewer is not showing you the actual file,
+but rather its interpretation of the file as a BMP, so too nano is not
+somehow showing you the `true' file, but only its interpretation of
+the file using the ASCII map.  This is somehow closer, in that each
+thing you see is one byte, but you aren't seeing the numbers
+themselves, you're seeing a particular choice of graphical
+representation of the numbers.  </p>
+
+<p>For example: 
+
+<code>~/untie$ hexdump -n 256 -C 2.bmp
+00000000  42 4d 9e 03 07 00 00 00  00 00 8a 00 00 00 7c 00  |BM............|.|
+00000010  00 00 cc 01 00 00 4d 01  00 00 01 00 18 00 00 00  |......M.........|
+00000020  00 00 14 03 07 00 c3 0e  00 00 c3 0e 00 00 00 00  |................|
+00000030  00 00 00 00 00 00 00 00  ff 00 00 ff 00 00 ff 00  |................|
+00000040  00 00 00 00 00 ff 42 47  52 73 8f c2 f5 28 51 b8  |......BGRs...(Q.|
+00000050  1e 15 1e 85 eb 01 33 33  33 13 66 66 66 26 66 66  |......333.fff&amp;ff|
+00000060  66 06 99 99 99 09 3d 0a  d7 03 28 5c 8f 32 00 00  |f.....=...(\.2..|
+00000070  00 00 00 00 00 00 00 00  00 00 04 00 00 00 00 00  |................|
+00000080  00 00 00 00 00 00 00 00  00 00 07 07 07 05 05 05  |................|
+00000090  04 04 04 05 05 05 07 07  07 09 09 09 0a 0a 0a 0a  |................|
+000000a0  0a 0a 08 08 08 0b 0b 0b  0c 0c 0c 0a 0a 0a 0b 0b  |................|
+000000b0  0b 0e 0e 0e 0c 0c 0c 07  07 07 04 06 06 03 05 05  |................|
+000000c0  04 06 06 06 08 08 09 0b  0b 0a 0c 0c 0c 0e 0e 0e  |................|
+000000d0  10 10 10 12 12 10 12 12  0e 10 10 0c 0e 0e 0b 0d  |................|
+000000e0  0d 0b 0d 0d 07 09 09 03  04 02 06 05 01 0a 09 05  |................|
+000000f0  11 0c 0d 13 0e 10 15 0f  10 12 0e 0d 0e 0b 06 08  |................|
+00000100</code>
+
+The column on the right is showing you the ASCII interpretation of the
+numbers whenever that makes sense (many bytes are not printable
+ASCII).  So in the ASCII table, entry 42 is the letter "B", and entry
+4d is the letter "M".  You can read about how an image viewer will use
+these numbers to construct the arrangemnt of pixels that you end up
+seeing at <a
+href="https://en.wikipedia.org/wiki/BMP_file_format">Wikipedia</a>.</p>
+
+<p>Very quickly: bytes 0 and 1 (42 and 4d) tell it that the file is a
+BMP file, byte number a (8a) tells it that the actual image data
+starts at byte number 8a, bytes number 12-15 (cc 01 00 00) tell it
+that the image has a width of 1cc pixels (460, in decimal), bytes
+16-19 tell it that the image has a height of 14d pixels (333, in
+decimal), and the subsequent bytes give some other information.  Then
+bytes 8a, 8b, and 8c give (respectively) the red, green, and blue
+values of the bottom-right pixel--in this case a very dark colour
+indistinguishable from black.  And so on.
+</p>
+
+</item>
+
+<item brief="yes" name="File extensions"><p>There is no such thing.  As far as the
+computer is concerned, a file called simply 'abc' could just as easily
+be a photo as a file called 'blah.mp3'.  Of course, it is nice being
+able to see just from the filename what sort of file you have to hand,
+and so there are conventions that people use--.jpg for JPEG-compressed
+images, .flac for FLAC-encoded audio files, and so on.  What sort of
+thing a file is is determined entirely by the data in the file.  For
+example, PNG files
+</p>
+
+<p>Additionally, some programs will actually enforce these
+conventions--maybe Audacity will refuse to open an MP3 file called
+`hallo.jpg'--and that's fine, but this is purely the prerogative of
+that particular program's author to code in that restriction on the
+name of the file, and not at all a fundamental system constraint.  For
+example, the image viewer feh will try to open every file as an image
+and only fail if it doesn't recognise the data in its own right as
+something it can render.  </p></item>
+
+
+</item>
+<item name="In bash, everything is a string"><p>If you've dealt with
+other programming languages, you might be accustomed to the notion
+that everything you type is a keyword ("true", "void", "function",
+"int") or a variable name, unless it is specifically marked otherwise.
+For instance, you can mark something as a string by surrounding it in
+"", and digits that stand alone are treated as numbers.</p>
+
+<p>Bash is the opposite: Everything in bash is a string unless
+otherwise specified.  In another programming language, a naked 26*26
+would stand in for the number 676.  To bash, these are just different
+strings.  
+<code>~/untie$ echo hello
+hello
+~/untie$ echo 26*26
+26*26</code>
+
+If you want bash to understand this as an arithmetic expression, you
+need to tell it to do so.  The syntax for `treat this string as an
+arithmetic expression' is to enclose it in $((..)).  Thus: 
+<code>~/untie$ echo $((26*26))
+676</code>
+
+Likewise, you can create variables using the = symbol: 
+
+<code>~/untie$ x=2</code>
+
+But even so, x is just the string "x" unless you explicitly denote
+that it is a variable name by prepending a $: 
+
+<code>~/untie$ echo x
+x
+~/untie$ echo $x
+2
+~/untie$ echo $((3+x))
+5
+~/untie$ echo $((3+$x))
+5</code>
+
+(Note that inside a $((...)), bash chooses to treat non-number symbols
+like x as variable names even if you don't call it as $x, since how is
+it going to do arithmetic with a string?)
+
+Further, outside of $((...)), all operations are assumed to be string
+operations: 
+
+<code>~/untie$ x=3
+~/untie$ echo $x
+3
+~/untie$ echo $x+1
+3+1
+~/untie$ x+=1
+~/untie$ echo $x
+31
+~/untie$ y=x+1
+~/untie$ echo $y
+x+1
+~/untie$ y=$x+1
+~/untie$ echo $y
+31+1</code>
+
+Wait--what happend with that last one?  In bash, "=" is the
+"assignment" operator, and "+=" is the "append to" operator, as we
+saw, but "+" by itself has no meaning.  So if it's not a special
+operator, then how did that line not error out?  Answer: In bash, to
+concatenate two strings, you just put them next to each other:
+
+<code>~/untie$ x=de
+~/untie$ y=em
+~/untie$ z=ploy
+~/untie$ echo $y $x
+em de
+~/untie$ echo $x $z
+de ploy
+~/untie$ echo $x$z
+deploy
+~/untie$ echo bla$x
+blade</code>
+
+And remember: Everything is a string!  So in that last example, this
+is the string "bla" next to the string "de" (from the variable x), so
+bash happily prints `blade'.  So in the previous example, we were just
+putting the string "31" (stored in x) next to the string "+1", which
+bash treated as concatenation.  
+
+<code>~/untie$ x=de
+~/untie$ y=em
+~/untie$ z=ploy
+~/untie$ echo $x+1
+de+1
+~/untie$ echo $ybezzle
+
+</code>
+
+Wait--what?  Should that last thing not have printed "embezzle"?
+Well, no, since what if I had a variable called ybezzle: 
+
+<code>~/untie$ y=em
+~/untie$ ybezzle=hello
+~/untie$ echo $y bezzle
+em bezzle
+~/untie$ echo $ybezzle
+hello
+</code>
+
+So how do I resolve this ambiguity and concatenate a naked string to a
+variable?  In bash, you can enclose something in "" to tell bash "this
+is ia separate string", so all of the following work: 
+
+<code>~/untie$ y=em
+~/untie$ ybezzle=hello
+~/untie$ echo $ybezzle
+hello
+~/untie$ echo $y"bezzle"
+embezzle
+~/untie$ echo "$y"bezzle
+embezzle
+~/untie$ echo "$y""bezzle"
+embezzle
+</code>
+
+The way bash reads <pre>$y"bezzle"</pre> is as follows: "OK, we've got
+two things: $y and "bezzle".  They're right next to each other, so
+once we figure out what they are, we'll concatenate them.  $y has got
+that $ sign, so it's referencing a variable.  Ah, good!  I've got a
+variable called y, so this "$y" business is just the string "em".  Now
+this "bezzle" business.  Ah, that's just the string, "bezzle"--nothing
+fancy happening here.  So I've got the strings "em" and "bezzle" next
+to each other--that makes for the single string "embezzle" for the
+final result.  </p>
+
+<p>And when I say everything's a string, I mean everything: 
+<code>~/untie$ bo=ech
+~/untie$ om="o"
+~/untie$ $bo$om $om$bo
+oech
+</code>
+Try it!
+</p>
+</item>
+</items>
+</page>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet href="style.xsl" type="text/xsl"?>
+<page title="Getting Started" uri="examples.xml">
+<h3>Examples</h3>
+<p>Here, we give some examples of tasks and an answer, or,
+occasionally, a few possible answers.  You might treat these as
+exercises and consult with the code provided when stuck.</p>
+<items>
+
+<item name="Create missing files">
+
+Find all files referenced in <a href="menu.xml">menu.xml</a> and if
+they don't exist, make them exist by making them into a copy of
+boilerplate.xml: 
+
+<code>$ for x in `cat menu.xml | sed -n '/url/{s/.*url="\([^"]*\)".*/\1/;p}'`; do 
+>    [[ ! -e $x ]] &amp;&amp; cp boilerplate.xml $x; 
+> done</code>
+</item>
+
+<item name="Find the longest line in a file">
+The following file exists: 
+<code>~/untie/ex$ cat afile
+a
+abc
+apsldugndj
+neuwef
+faaaaaaaaaaaaaaaaaaz
+sdsda
+</code>
+
+We want to print only its longest line.  There are many options: 
+
+<code>~/untie/ex$ cat afile | while read x; do echo ${#x} $x; done | sort -n | sed '$!d'
+faaaaaaaaaaaaaaaaaaz</code>
+
+<code>~/untie/ex$ sed -n '1h;H;g;:a;s/.\n./\n/g;ta;/\n$/{g;s/\n.*//};/^\n/{g;s/.*\n//};h;$p' afile
+faaaaaaaaaaaaaaaaaaz</code>
+</item>
+<item name="Find the first 10-digit prime in the digits of e">
+
+<p>This is mostly a string-processing problem--we want to get the
+first 1000 or so digits of e, and then somehow get all length-10
+substrings.  After that, we can just pipe to factor and check for a
+single factor.  There are many ways to do it, and of course other
+languages might be more suitable, but we use sed, for fun:
+
+<code>~/untie$ echo -e "scale=1000; e(1)" | bc -l | tr -d '\\\n.' | sed '/.\{10\}/!{x;q};s/^\(.\)\(.\{9\}\)/\1\2\n\2/;H;x;s/\n[^\n]*$//;x;D'|factor|sed 's/: [0-9]*$//;ta;d;:a;q'</code>
+
+</p></item>
+<item name="Generate b1/EG">
+<code>~/untie/b1$ <b>for x in {1..200}; do echo $(cat ln | sed -n $((($RANDOM%596)+1))p),$(cat fn | sed -n $((($RANDOM%288)+1))p),$(cat g | sed -n $((($RANDOM%5)+1))p); done</b></code>
+</item>
+<item name="Read the story in the page titles">
+If you've been paying attention to the titles, you might have guessed
+they form a story if you put them in the correct order.  
+
+<code>~/untie/tut/$ cat *.xml | grep 'page title="[0-9]' | sed 's/.*"//;s/".*//' | sort -n | sed 's/^ *[0-9]* *//'</code>
+</item>
+
+</items>
+</page>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet href="style.xsl" type="text/xsl"?>
+<page title="Getting Started" uri="start.xml">
+<h3>Getting Started</h3>
+<p>To begin using this tutorial, there are a few steps to set up your
+environment: Open up a command-line interface and run the following
+command:
+
+<code>$ <b>git clone ...</b></code>
+</p>
+
+<p>This will create a new folder called "untie" in your current
+directory.  Move into this folder: 
+
+<code>$ <b>cd untie</b></code></p>
+
+<p>And then run the following line: 
+
+<code>$ <b>source setup</b></code>
+</p>
+
+<p>Now, rather than seeing a "$" before every command, you'll see your
+current directory like so: 
+
+<code>~/untie$ <b>echo hello</b>
+hello</code></p>
+
+<p>Our convention, as you might have gathered, is that things that are
+happening in the terminal will be put in blue code blocks.  Within
+these, bold text indicates text you are supposed to type, and non-bold
+text is meant to be outputted on its own.  In addition, red,
+italicised text will be author's commentary and won't actually appear
+in your terminal.</p>
+
+<p>A word now about the organisation of this tutorial: Both the basic
+and advanced sections are centred around a set of guided tasks, where
+you will e.g. refactor a programming project, write an alarm clock
+script, batch resize images, and more, and the bash skills necessary
+for each of these will be explained along the way.  A quick summary of the intent
+of each of the sections:
+
+<ul>
+<li><b>Basic tutorial: </b>This is meant as a decent, standalone
+introduction to bash for the total beginner.  Along the way, we will
+discuss also system calls, some file formats, and a few less-used bash
+commands, so it should be informative for someone who is not entirely
+a beginner as well.
+</li>
+<li><b>Advanced tutorial: </b>This is built on the foundation of the
+basic tutorial and covers advanced command usage and pipelines as well
+as some of the subtleties arising from an understanding of bash and,
+indeed, Linux internals.  </li>
+<li><b>Reference: </b>This section contains a summary of all the bash
+commands and language features used in this tutorial, as well as brief
+tutorials explaining certain select programs (or certain features of
+these programs) that the author deemed very useful and for which a
+pre-existing online tutorial was not easily located.  </li>
+</ul></p>
+</page>

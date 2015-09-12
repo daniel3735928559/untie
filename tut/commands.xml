@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet href="style.xsl" type="text/xsl"?>
+<page title="Commands" uri="commands.xml">
+<items name="Simple Commands">
+<item name="file management">
+  <item name="cd"></item>
+  <item name="ls"></item>
+  <item name="touch"></item>
+  <item name="rm"></item>
+  <item name="mv"></item>
+  <item name="cp"></item>
+  <item name="stat"></item>
+  <item name="mkdir"></item>
+  <item name="rmdir"></item>
+  <item name="less"></item>
+  <item name="cat"></item>
+  <item name="ln"></item>
+  <item name="file"></item>
+  <item name="find"></item>
+  <item name="tar"></item>
+  <item name="df"></item>
+  <item name="du"></item>
+  <item name="pwd"></item>
+  <item name="gzip,gunzip,bzip2,bunzip2,xz,unxz,etc."></item>
+</item>
+<item name="string processing">
+  <item name="nl"></item>
+  <item name="tr"></item>
+  <item name="bc"></item>
+  <item name="expr"></item>
+  <item name="test"></item>
+  <item name="printf"></item>
+  <item name="echo"></item>
+  <item name="wc"></item>
+  <item name="diff"></item>
+  <item name="grep"></item>
+  <item name="sed"></item>
+  <item name="awk"></item>
+  <item name="nano"></item>
+  <item name="head"></item>
+  <item name="tail"></item>
+  <item name="uniq"></item>
+  <item name="sort"></item>
+  <item name="shuf"></item>
+</item>
+<item name="binary files">
+  <item name="strings"></item>
+  <item name="hexdump"></item>
+  <item name="dd"></item>
+  <item name="hexedit"></item>
+</item>
+<item name="executable files">
+  <item name="ndisasm"></item>
+  <item name="objdump"></item>
+  <item name="readelf"></item>
+  <item name="strace"></item>
+  <item name="ldd"></item>
+  <item name="gdb"></item>
+  <item name="ltrace"></item>
+</item>
+<item name="network">
+  <item name="netcat"></item>
+  <item name="dig"></item>
+  <item name="netstat"></item>
+  <item name="traceroute"></item>
+  <item name="ping"></item>
+  <item name="curl"></item>
+  <item name="sftp"></item>
+  <item name="ssh"></item>
+  <item name="scp"></item>
+  <item name="wget"></item>
+</item>
+<item name="process management">
+  <item name="free"></item>
+  <item name="lsof"></item>
+  <item name="fuser"></item>
+  <item name="fg"></item>
+  <item name="bg"></item>
+  <item name="kill"></item>
+  <item name="killall"></item>
+  <item name="ps"></item>
+  <item name="top"></item>
+</item>
+<item name="help">
+  <item name="man"></item>
+  <item name="apropos"></item>
+</item>
+<item name="pipeline control">
+  <item name="tee"></item>
+  <item name="xargs"></item>
+  <item name="mkfifo"></item>
+</item>
+<item name="date and time">
+  <item name="time">
+    <code>
+$ time for x in {1..10000}; do printf '\r'; done
+
+real	0m0.147s
+user	0m0.070s
+sys	0m0.037s
+    </code>
+  </item>
+  <item name="date"></item>
+  <item name="cal"></item>
+</item>
+<item name="permissions">
+  <item name="chmod"></item>
+  <item name="sudo"></item>
+  <item name="su"></item>
+</item>
+<item name="crypto">
+  <item name="md5sum,sha1sum,etc."></item>
+  <item name="openssl"></item>
+  <item name="pgp"></item>
+</item>
+</items>
+</page>

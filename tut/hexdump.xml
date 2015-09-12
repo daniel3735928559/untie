@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet href="style.xsl" type="text/xsl"?>
+<page title="hexdump" uri="hexdump.xml">
+<h3>hexdump</h3>
+<pre>
+hexdump's manpage is reasonably readable, except its explanation of
+the -e flag.  We give an example here that should explain what this
+does: 
+
+$ hexdump -s 0x90 -v -n 64 -e '"0x%04_ax:  "' -e '8/1 "%02x "' -e '"\n"'  kernel.bin
+  0       1       2  3     4    5 67 8 9A     B   C D  EF GH   I   J      K
+0x0090:  01 e6 21 b0 01 e6 a1 58
+0x0098:  c3 60 66 8c d8 50 66 b8
+0x00a0:  10 00 8e d8 8e c0 8e e0
+0x00a8:  8e e8 e8 8a 2c 00 00 58
+0x00b0:  8e d8 8e c0 8e e0 8e e8
+0x00b8:  61 81 c4 08 00 00 00 fb
+0x00c0:  cf fa 6a 00 6a 00 eb d1
+0x00c8:  fa 6a 00 6a 01 eb ca fa
+
+Read out loud, this goes: 
+
+[0] hexdump
+[1] Starting at byte 0x90
+[2] Don't skip any output lines
+[3] Print out 64 bytes after the starting point
+[4] Output the following printf-style expression
+   [5] Start with the string "0x"
+   [6] Output a special character
+   [7] Make this character take up exactly four spaces in width
+   [8] The special character is _a, which is the address of the current byte
+   [9] Print this out in hex
+   [A] Now print out the string ":  "
+[B] Now output the next printf expression: 
+   [C] Run this format string 8 times
+   [D] Run it with 1 byte at a time
+   [E] Output here a special character
+   [F] Make it take two spaces in width
+   [G] Output it in hex
+   [H] Now output " "
+[I] Now output the following printf style string: 
+   [J] Output the string "\n"
+[K] Run this on the file kernel.bin</pre>
+</page>

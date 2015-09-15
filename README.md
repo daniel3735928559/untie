@@ -15,4 +15,5 @@ both explanations and exercises, but was never completed.
 
 To see what's there, clone this repo, spin up your HTTP server of
 choice in the cloned repo directory, and point your browser at
-`localhost/tut/start.xml`
+`localhost/tut/start.xml`, or just go to
+[http://daniel3735928559.github.io/untie/tut.start.xml](http://daniel3735928559.github.io/untie/tut.start.xml)
